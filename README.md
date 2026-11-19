@@ -16,7 +16,7 @@ Netcad kullanan harita büroları, kurumlar ve tüm harita mühendisi ve teknike
 | Klasör | İçerik |
 |---|---|
 | `ncz/` | `ncz_reader.py`: Netcad 8.x NCZ okuyucu (katmanlar, nokta, çizgi, poligon, yazı, pafta çerçevesi). `NCZ_FORMAT.md`: biçim notları. |
-| `aplikasyon/` | `aplikasyon_alan_hesabi.html`: Aplikasyon belgesinden köşe koordinatlarını alıp alan hesabı, tapu–hesap alanı ve yanılma sınırı kontrolü yapan, **doğrudan NCZ** (ve DXF/NCN/rapor) üreten tek dosyalık sayfa. Ücretsizdir: metinli PDF doğrudan okunur, taranmış belgede koordinatlar kendi yapay zekâ sohbetinizden yapıştırılır; tam otomatik okuma için isteğe bağlı API anahtarı. |
+| `aplikasyon/` | `aplikasyon_alan_hesabi.html`: Aplikasyon belgesinden köşe koordinatlarını alıp alan hesabı, tapu–hesap alanı ve yanılma sınırı kontrolü yapan, **doğrudan NCZ** (ve DXF/NCN/rapor) üreten tek dosyalık sayfa. Ücretsizdir. Claude'da yapıt olarak yayınlandığında belgeyi kullanıcının kendi hesabıyla tek tıkla okur; tarayıcıda metinli PDF doğrudan okunur, taranmış belgede koordinatlar yapay zekâ sohbetinden yapıştırılır, tam otomatik okuma için isteğe bağlı API anahtarı. |
 | `pafta-indeksi-3b/` | Parselin hangi paftalara girdiğini gösteren, telefonda da çalışan 3B pafta indeksi (MapLibre). `ornek_veri.py` uydurma veriyle deneme paketi üretir. |
 | `kadastro/` | `kad.py`: Açık kadastro pafta çizgilerinden numaralı pafta alanları üretir (düğümleme + boşluk kapatma). |
 | `geodezi/` | ITRF 1/1000 pafta adı hesabı ve tapu alanı yanılma sınırı. |

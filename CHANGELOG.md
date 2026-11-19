@@ -2,6 +2,7 @@
 
 ## Yayımlanmamış
 
+- **Aplikasyon Alan Hesabı**: Claude'da yapıt olarak yayınlandığında belgeyi kullanıcının kendi Claude hesabıyla okur; aynı dosya tarayıcıda da çalışır.
 - **Aplikasyon Alan Hesabı**: API anahtarı olmadan belge okuma yolu (hazır istem metni, "İstemi kopyala"). "Metinden yapıştır" artık Markdown tablo, virgüllü liste, numaralı liste ve `Y=`/`X=` biçimlerini tanır.
 
 ## 1.0.0 — 2026-11-19

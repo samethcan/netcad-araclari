@@ -161,6 +161,7 @@ a{color:var(--accent)}
     <details class="paste" id="freeBox" hidden>
       <summary>Anahtarsız okuma (ücretsiz)</summary>
       <p class="hint">Metinli PDF'lerde "PDF'ten koordinatları al" koordinatları doğrudan alır. Taranmış belge ya da fotoğrafta belgeyi kendi yapay zekâ sohbetinize (ör. Claude) yükleyip aşağıdaki istemi gönderin; gelen satırları 3. bölümdeki "Metinden yapıştır" alanına yapıştırın. Ek ücret gerekmez.</p>
+      <p class="hint"><b>Claude kullanıyorsanız:</b> bu dosyayı Claude'da yeni bir sohbete ekleyip "Bu dosyayı yapıt olarak yayınla" yazın. Araç kendi hesabınızda açılır ve "Belgeyi oku" ile belgeyi tek tıkla, kendi kullanım hakkınızla okur.</p>
       <textarea id="freePrompt" readonly rows="5" style="min-height:0;resize:vertical">Ekteki aplikasyon belgesindeki parsel köşe noktalarının koordinatlarını yaz. Her satıra bir nokta: nokta adı, Y, X; boşlukla ayır, başka metin ekleme. Değerleri belgede yazdığı gibi aktar. Poligon ve yer kontrol noktalarını alma.</textarea>
       <div class="row" style="margin-top:8px">
         <button id="freeCopy">İstemi kopyala</button>
@@ -394,7 +395,7 @@ async function getTemplate(){
   return templateBytes;
 }
 
-const STANDALONE = true;
+const STANDALONE = !window.claude;
 (() => {
 const $ = s => document.querySelector(s);
 const KEY = 'aplikasyon-alan-v3';
@@ -1063,6 +1064,7 @@ Yanıtın yalnızca şu biçimde tek bir JSON nesnesi olsun:
  "noktalar":[{"no":"K1","y":1000.00,"x":2015.00,"belirsiz":false}], "itrf_noktalar":null,
  "parseller":[{"ad":"100/1","noktalar":["K1","K2","K7","K8"],"hesap_alani":150.00,"tapu_alani":150.50,"yanilma_siniri":2.80,"ic_alan":null,"dis_alan":null,"sira_tahmini":true}]}`;
 const ERR = {
+  not_granted:'Claude kullanım izni verilmedi. İzin verirseniz belge okunabilir.', sampling_disabled:'Bu hesapta Claude kullanılamıyor.',
   rate_limited:'Kullanım sınırına ulaşıldı ya da çok sık istek gönderildi. Biraz sonra yeniden deneyin.',
   image_rejected:'Görsel kabul edilmedi; daha net bir fotoğraf deneyin.', images_unavailable:'Bu görünümde görsel gönderilemiyor.',
   invalid_json:'Yanıt çözümlenemedi. Yeniden deneyin.', refused:'Belge okunamadı.', empty_completion:'Boş yanıt geldi. Yeniden deneyin.',
@@ -1129,6 +1131,19 @@ if (STANDALONE) {
   $('#nczDesc').textContent = 'PARSEL katmanında adlı parsel alanları, NOKTA katmanında adlı köşe noktaları. Doğrudan .ncz iner.';
   $('#nczNote').textContent = 'NCZ, Netcad 8.5.6’nın kendi ürettiği örnek proje dosyasının yapısıyla yazılır: katmanlar 0, PARSEL, NOKTA. Dosya doğrudan .ncz olarak iner.';
   $('#docMsg').textContent = sample ? 'Belge yükleyin ve "Belgeyi oku"ya basın.' : 'Belge yükleyin. Metinli PDF koordinatları doğrudan okunur; taranmış belgeler için "Anahtarsız okuma" adımlarını izleyin ya da API anahtarı ekleyin.';
+} else if (window.claude?.use) {
+  const localDl = { save: async ({ filename, data }) => {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    return { status: 'saved' };
+  } };
+  claude.use('downloads').then(d => { downloads = d || localDl; document.querySelectorAll('.dl').forEach(b => b.hidden = false); }).catch(() => { downloads = localDl; document.querySelectorAll('.dl').forEach(b => b.hidden = false); });
+  claude.use('sample').then(async s => {
+    sample = s;
+    if (s) { try { imgLimits = (await s.limits())?.images || null; } catch(e) {} updButtons(); }
+    else setupApi();
+  }).catch(() => setupApi());
 }
 })();
 </script>
