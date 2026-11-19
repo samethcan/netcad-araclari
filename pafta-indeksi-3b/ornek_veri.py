@@ -4,7 +4,11 @@ Kullanım: python ornek_veri.py ornek.b64
 Sonra:    python build.py --veri ornek.b64 --maplibre <maplibre-gl/dist>
 Gerekli: shapely >= 2.0
 """
-import base64, gzip, json, sys
+import base64
+import gzip
+import json
+import sys
+
 from shapely.geometry import box
 
 OY, OX = 500000.0, 4300000.0        # uydurma başlangıç (TM27)
@@ -87,5 +91,6 @@ data = {
     'meta': {'kaynak': 'uydurma örnek veri', 'tarih': '-', 'parsel': len(P), 'yersel': len(Y), 'itrf': len(I), 'kadastro': len(K), 'crs': 'TUREF / TM27 (EPSG:5253)'},
 }
 raw = json.dumps(data, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
-open(sys.argv[1] if len(sys.argv) > 1 else 'ornek.b64', 'w').write(base64.b64encode(gzip.compress(raw, 9, mtime=0)).decode())
+with open(sys.argv[1] if len(sys.argv) > 1 else 'ornek.b64', 'w') as fh:
+    fh.write(base64.b64encode(gzip.compress(raw, 9, mtime=0)).decode())
 print(f'{len(P)} uydurma parsel yazıldı')

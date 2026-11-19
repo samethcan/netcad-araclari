@@ -48,13 +48,13 @@ def blocks(b):
 
 def _s(b, o, maxlen=255):
     L = b[o]
-    if L > maxlen or o + 1 + L > len(b):
+    if maxlen < L or o + 1 + L > len(b):
         return None
     return b[o + 1:o + 1 + L].decode('cp1254', 'replace')
 
 
 def layer_names(b, bl):
-    for o, k, n in bl:
+    for o, k, _n in bl:
         if k == 6:
             cnt = int.from_bytes(b[o + 16:o + 18], 'little')
             names = []
@@ -68,7 +68,8 @@ def layer_names(b, bl):
 
 
 def read(path):
-    b = open(path, 'rb').read()
+    with open(path, 'rb') as fh:
+        b = fh.read()
     bl = blocks(b)
     names = layer_names(b, bl)
     feats, kinds, broken = [], Counter(), [x for x in bl if x[1] is None]

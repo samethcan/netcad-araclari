@@ -3,17 +3,24 @@
 Kullanım: python kad.py pafta_cizgileri.ncz
 Gerekli: shapely >= 2.0
 """
-import os, sys, struct
+import os
+import struct
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ncz'))
-import ncz_reader as R
 from collections import Counter, defaultdict
+
+import ncz_reader as R
 from shapely import STRtree, polygonize_full
 from shapely import unary_union as _uu
 from shapely.geometry import LineString, Point
 from shapely.ops import nearest_points
 
+
 def faces(path, gap=10.0):
-    b = open(path, 'rb').read(); r = R.read(path); F = r['feats']
+    with open(path, 'rb') as fh:
+        b = fh.read()
+    r = R.read(path); F = r['feats']
     lines = []
     for f in F:
         if f['type'] == 7 and len(f['pts']) >= 2: lines.append(LineString(f['pts']))
@@ -42,7 +49,7 @@ def faces(path, gap=10.0):
             if dist <= gap and (best is None or dist < best[0]): best = (dist, nearest_points(e, g)[1])
         if best: add.append(LineString([e, best[1]]))
     U2 = _uu(list(U.geoms) + add, grid_size=0.05)
-    polys, cuts, dangles2, _ = polygonize_full(list(U2.geoms))
+    polys, _cuts, dangles2, _ = polygonize_full(list(U2.geoms))
     P = list(polys.geoms); t2 = STRtree(P); ins = defaultdict(list); orphan = []; pending = []
     for t, p in T:
         h = [i for i in t2.query(p) if P[i].contains(p)]

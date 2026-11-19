@@ -10,7 +10,7 @@ readme = "ncz/README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Samet Hüseyin Can" }]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ["netcad", "ncz", "cbs", "gis", "kadastro", "harita", "geojson"]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -30,3 +30,13 @@ ncz-oku = "netcad_ncz.ncz_reader:main"
 [tool.setuptools]
 packages = ["netcad_ncz"]
 package-dir = { netcad_ncz = "ncz" }
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "SIM", "B"]
+ignore = ["E701", "E702", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

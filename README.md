@@ -1,5 +1,7 @@
 # netcad-araclari
 
+[![Testler](https://github.com/samethcan/netcad-araclari/actions/workflows/tests.yml/badge.svg)](https://github.com/samethcan/netcad-araclari/actions/workflows/tests.yml)
+
 Netcad kullanan harita büroları, kurumlar ve tüm harita mühendisi ve teknikerleri için küçük, bağımsız araçlar. Depoda **yalnızca kod ve belge** vardır; hiçbir kuruma ait parsel, pafta, koordinat, belge ya da görüntü verisi yoktur. Örnekler tamamen uydurmadır.
 
 **Canlı demo (kurulum gerekmez):** https://samethcan.github.io/netcad-araclari/
@@ -35,3 +37,6 @@ python build.py --veri ornek.b64 --maplibre <maplibre-gl/package/dist>
 
 ## Lisans
 MIT açık kaynak yazılım lisansı (yazılım kullanım izni; üniversite ile ilgisi yoktur): kod ücretsiz kullanılabilir, değiştirilebilir ve dağıtılabilir, yeter ki telif notu korunsun. Ayrıntı için `LICENSE`. `demo/pafta-indeksi-3b/` içindeki derlenmiş demo MapLibre GL JS (BSD-3) içerir; lisansı `MAPLIBRE_LICENSE.txt`.
+
+## English
+Open-source tools for surveyors and GIS professionals working with **Netcad**: a Python reader for the undocumented Netcad 8.x **NCZ** format (`pip install netcad-ncz`, GeoJSON export), a browser tool that computes parcel areas from cadastral setting-out (aplikasyon) documents and writes NCZ/DXF files, and a mobile-friendly 3D map-sheet index. No institutional data is included; all samples are synthetic. Live demo: https://samethcan.github.io/netcad-araclari/

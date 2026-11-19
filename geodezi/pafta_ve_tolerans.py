@@ -23,7 +23,7 @@ def itrf_ad(lon, lat, L0=27.0, T0=38.5, blok='L18'):
 
 def yanilma_siniri(A):
     for lo, base, r in [(25000, 84.80, .0015), (5000, 24.80, .003), (1000, 8.80, .004), (500, 6.30, .005), (100, 2.30, .01), (10, 0.50, .02)]:
-        if A >= lo + 1:
+        if lo + 1 <= A:
             return base + (A - lo) * r
     return min(A * 0.05, 0.50)
 

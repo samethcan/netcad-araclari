@@ -6,7 +6,8 @@ Kullanım:
 veri.b64 : gzip + base64 JSON veri paketi (biçim: README.md; örnek üretici: ornek_veri.py)
 maplibre : maplibre-gl@4.7.1 paketinin dist klasörü (npm pack maplibre-gl@4.7.1)
 """
-import argparse, pathlib
+import argparse
+import pathlib
 
 W = pathlib.Path(__file__).resolve().parent
 ap = argparse.ArgumentParser()
