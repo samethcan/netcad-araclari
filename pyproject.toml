@@ -10,7 +10,7 @@ readme = "ncz/README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Samet Hüseyin Can" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["netcad", "ncz", "cbs", "gis", "kadastro", "harita", "geojson"]
 classifiers = [
   "Programming Language :: Python :: 3",
