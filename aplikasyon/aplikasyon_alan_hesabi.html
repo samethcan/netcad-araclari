@@ -160,9 +160,14 @@ a{color:var(--accent)}
     <p class="msg" id="docMsg">Belge yüklenmedi. Koordinatları ve alanları aşağıya elle de girebilirsiniz.</p>
     <details class="paste" id="freeBox" hidden>
       <summary>Anahtarsız okuma (ücretsiz)</summary>
-      <p class="hint">Metinli PDF'lerde "PDF'ten koordinatları al" koordinatları doğrudan alır. Taranmış belge ya da fotoğrafta belgeyi kendi yapay zekâ sohbetinize (ör. Claude) yükleyip aşağıdaki istemi gönderin; gelen satırları 3. bölümdeki "Metinden yapıştır" alanına yapıştırın. Ek ücret gerekmez.</p>
-      <p class="hint"><b>Claude kullanıyorsanız:</b> bu dosyayı Claude'da yeni bir sohbete ekleyip "Bu dosyayı yapıt olarak yayınla" yazın. Araç kendi hesabınızda açılır ve "Belgeyi oku" ile belgeyi tek tıkla, kendi kullanım hakkınızla okur.</p>
-      <textarea id="freePrompt" readonly rows="5" style="min-height:0;resize:vertical">Ekteki aplikasyon belgesindeki parsel köşe noktalarının koordinatlarını yaz. Her satıra bir nokta: nokta adı, Y, X; boşlukla ayır, başka metin ekleme. Değerleri belgede yazdığı gibi aktar. Poligon ve yer kontrol noktalarını alma.</textarea>
+      <p class="hint"><b>Claude kullanıyorsanız (en kolay yol):</b> aşağıdaki cümleyi Claude'da yeni bir sohbete yapıştırın. Araç kendi hesabınızda açılır; "Belgeyi oku" belgeyi tek tıkla, kendi kullanım hakkınızla okur ve NCZ'yi verir.</p>
+      <textarea id="claudeCmd" class="fit" readonly rows="3" style="min-height:0;resize:vertical">Şu dosyayı indir, yapıt olarak yayınla ve belge okuma ile indirme izinlerini aç: https://raw.githubusercontent.com/samethcan/netcad-araclari/main/aplikasyon/aplikasyon_alan_hesabi.html</textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="claudeCopy">Cümleyi kopyala</button>
+        <span class="msg" id="claudeMsg" style="margin:0"></span>
+      </div>
+      <p class="hint" style="margin-top:14px"><b>Claude dışında:</b> metinli PDF'lerde "PDF'ten koordinatları al" koordinatları doğrudan alır. Taranmış belge ya da fotoğrafta belgeyi kullandığınız yapay zekâ sohbetine yükleyip aşağıdaki istemi gönderin; gelen satırları 3. bölümdeki "Metinden yapıştır" alanına yapıştırın. Ek ücret gerekmez.</p>
+      <textarea id="freePrompt" class="fit" readonly rows="5" style="min-height:0;resize:vertical">Ekteki aplikasyon belgesindeki parsel köşe noktalarının koordinatlarını yaz. Her satıra bir nokta: nokta adı, Y, X; boşlukla ayır, başka metin ekleme. Değerleri belgede yazdığı gibi aktar. Poligon ve yer kontrol noktalarını alma.</textarea>
       <div class="row" style="margin-top:8px">
         <button id="freeCopy">İstemi kopyala</button>
         <span class="msg" id="freeMsg" style="margin:0"></span>
@@ -946,13 +951,14 @@ $('#apiSave').onclick = () => {
   $('#apiMsg').textContent = 'Kaydedildi. Belge yükleyip "Belgeyi oku"ya basın.'; $('#apiMsg').className = 'msg good'; setupApi();
 };
 $('#apiModel').addEventListener('change', () => lsSet(API_MODEL_K, $('#apiModel').value));
-const fitPrompt = () => { const t = $('#freePrompt'); t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; };
-$('#freeBox').addEventListener('toggle', fitPrompt); window.addEventListener('resize', () => { if ($('#freeBox').open) fitPrompt(); });
-$('#freeCopy').onclick = async () => {
-  const ta = $('#freePrompt'), m = $('#freeMsg');
+const fitAll = () => document.querySelectorAll('#freeBox textarea.fit').forEach(t => { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; });
+$('#freeBox').addEventListener('toggle', fitAll); window.addEventListener('resize', () => { if ($('#freeBox').open) fitAll(); });
+const copyFrom = (ta, m) => async () => {
   try { await navigator.clipboard.writeText(ta.value); m.textContent = 'Kopyalandı.'; m.className = 'msg good'; }
   catch (e) { ta.focus(); ta.select(); m.textContent = 'Metin seçildi; Ctrl+C ile kopyalayın.'; m.className = 'msg'; }
 };
+$('#freeCopy').onclick = copyFrom($('#freePrompt'), $('#freeMsg'));
+$('#claudeCopy').onclick = copyFrom($('#claudeCmd'), $('#claudeMsg'));
 $('#apiDel').onclick = () => { lsSet(API_KEY_K, ''); $('#apiMsg').textContent = 'Anahtar bu bilgisayardan silindi.'; $('#apiMsg').className = 'msg'; setupApi(); };
 const dm = (t, c='') => { const m = $('#docMsg'); m.textContent = t; m.className = 'msg ' + c; };
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -1142,8 +1148,8 @@ if (STANDALONE) {
   claude.use('sample').then(async s => {
     sample = s;
     if (s) { try { imgLimits = (await s.limits())?.images || null; } catch(e) {} updButtons(); }
-    else setupApi();
-  }).catch(() => setupApi());
+    else { setupApi(); $('#freeBox').hidden = false; }
+  }).catch(() => { setupApi(); $('#freeBox').hidden = false; });
 }
 })();
 </script>
