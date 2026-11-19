@@ -1,6 +1,8 @@
 # netcad-araclari
 
 [![Testler](https://github.com/samethcan/netcad-araclari/actions/workflows/tests.yml/badge.svg)](https://github.com/samethcan/netcad-araclari/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/netcad-ncz)](https://pypi.org/project/netcad-ncz/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24363592.svg)](https://doi.org/10.5281/zenodo.24363592)
 
 Netcad kullanan harita büroları, kurumlar ve tüm harita mühendisi ve teknikerleri için küçük, bağımsız araçlar. Depoda **yalnızca kod ve belge** vardır; hiçbir kuruma ait parsel, pafta, koordinat, belge ya da görüntü verisi yoktur. Örnekler tamamen uydurmadır.
 
@@ -34,6 +36,11 @@ python build.py --veri ornek.b64 --maplibre <maplibre-gl/package/dist>
 ## Uyarılar
 - NCZ biçimi resmî olarak belgelenmemiştir; notlar tersine mühendisliktir. Üretilen dosyaları Netcad'de kontrol edin.
 - Yanılma sınırı fonksiyonundaki 0–10 m² kuralı doğrulanmamıştır.
+
+## Atıf
+Bu araçları bir çalışmada kullanırsanız:
+
+> Can, S. H. (2026). *netcad-araclari: Netcad kullanan haritacılar için açık kaynak araçlar* (Sürüm 1.0.0) [Yazılım]. Zenodo. https://doi.org/10.5281/zenodo.24363592
 
 ## Lisans
 MIT açık kaynak yazılım lisansı (yazılım kullanım izni; üniversite ile ilgisi yoktur): kod ücretsiz kullanılabilir, değiştirilebilir ve dağıtılabilir, yeter ki telif notu korunsun. Ayrıntı için `LICENSE`. `demo/pafta-indeksi-3b/` içindeki derlenmiş demo MapLibre GL JS (BSD-3) içerir; lisansı `MAPLIBRE_LICENSE.txt`.
