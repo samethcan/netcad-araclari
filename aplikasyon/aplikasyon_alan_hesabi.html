@@ -158,6 +158,15 @@ a{color:var(--accent)}
       <button id="stopBtn" hidden>Durdur</button>
     </div>
     <p class="msg" id="docMsg">Belge yüklenmedi. Koordinatları ve alanları aşağıya elle de girebilirsiniz.</p>
+    <details class="paste" id="freeBox" hidden>
+      <summary>Anahtarsız okuma (ücretsiz)</summary>
+      <p class="hint">Metinli PDF'lerde "PDF'ten koordinatları al" koordinatları doğrudan alır. Taranmış belge ya da fotoğrafta belgeyi kendi yapay zekâ sohbetinize (ör. Claude) yükleyip aşağıdaki istemi gönderin; gelen satırları 3. bölümdeki "Metinden yapıştır" alanına yapıştırın. Ek ücret gerekmez.</p>
+      <textarea id="freePrompt" readonly rows="5" style="min-height:0;resize:vertical">Ekteki aplikasyon belgesindeki parsel köşe noktalarının koordinatlarını yaz. Her satıra bir nokta: nokta adı, Y, X; boşlukla ayır, başka metin ekleme. Değerleri belgede yazdığı gibi aktar. Poligon ve yer kontrol noktalarını alma.</textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="freeCopy">İstemi kopyala</button>
+        <span class="msg" id="freeMsg" style="margin:0"></span>
+      </div>
+    </details>
     <details class="paste" id="apiBox" hidden>
       <summary id="apiSum">Otomatik okumayı aç (yapay zekâ API anahtarı)</summary>
       <p class="hint">Taranmış belgeleri bu bilgisayarda otomatik okumak için Anthropic API anahtarınızı bir kez girin. Anahtar yalnızca bu bilgisayarın tarayıcısında saklanır; HTML dosyasına yazılmaz, dosyayı başkasına verdiğinizde gitmez.</p>
@@ -204,7 +213,7 @@ a{color:var(--accent)}
       <textarea id="pasteTxt" placeholder="Her satıra bir nokta:&#10;K1  1000.00  2015.00&#10;K2  1010.00  2015.00"></textarea>
       <div class="row" style="margin-top:8px">
         <button class="primary" id="pasteBtn">Tabloya aktar</button>
-        <span class="hint" style="margin:0">Biçim: Nokta Y X (boşluk, sekme veya ; ayraçlı; Excel’den kopyalanabilir; virgüllü ondalık olur)</span>
+        <span class="hint" style="margin:0">Biçim: Nokta Y X (boşluk, sekme, ; ya da | ayraçlı; Excel’den veya yapay zekâ sohbetinden kopyalanabilir; virgüllü ondalık olur)</span>
       </div>
     </details>
   </div>
@@ -438,11 +447,17 @@ const splitSeq = s => String(s ?? '').split(/[\s,;\-–—>→]+/).map(t => t.tr
 /* ---------- metinden nokta ---------- */
 function genericParse(text){
   const out = [];
+  const clean = v => v.trim().replace(/^\*+|\*+$/g, '').replace(/^[YyXx]\s*[=:]\s*/, '').replace(/[:,]$/, '').trim();
+  const num = v => { const n = parseNum(v); return Number.isFinite(n) ? n : NaN; };
   for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim(); if (!line) continue;
-    let t = /[;\t]/.test(line) ? line.split(/[;\t]+/) : line.split(/\s+/);
-    t = t.map(s => s.trim()).filter(Boolean);
-    if (t.length >= 3) { const y = parseNum(t[1]), x = parseNum(t[2]); if (Number.isFinite(y) && Number.isFinite(x)) out.push({ no: t[0], y, x }); }
+    const line = raw.trim(); if (!line || /^[|:\-\s]+$/.test(line)) continue;
+    let t = /[;\t|]/.test(line) ? line.split(/[;\t|]+/) : line.split(/,\s+|\s+/);
+    t = t.map(clean).filter(Boolean);
+    if (t.length < 3) continue;
+    if (Number.isFinite(num(t[1])) && Number.isFinite(num(t[2]))) { out.push({ no: t[0], y: num(t[1]), x: num(t[2]) }); continue; }
+    for (let i = 1; i < t.length - 1; i++) {
+      if (Number.isFinite(num(t[i])) && Number.isFinite(num(t[i+1])) && !Number.isFinite(num(t[i-1]))) { out.push({ no: t[i-1], y: num(t[i]), x: num(t[i+1]) }); break; }
+    }
   }
   return out;
 }
@@ -930,6 +945,13 @@ $('#apiSave').onclick = () => {
   $('#apiMsg').textContent = 'Kaydedildi. Belge yükleyip "Belgeyi oku"ya basın.'; $('#apiMsg').className = 'msg good'; setupApi();
 };
 $('#apiModel').addEventListener('change', () => lsSet(API_MODEL_K, $('#apiModel').value));
+const fitPrompt = () => { const t = $('#freePrompt'); t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; };
+$('#freeBox').addEventListener('toggle', fitPrompt); window.addEventListener('resize', () => { if ($('#freeBox').open) fitPrompt(); });
+$('#freeCopy').onclick = async () => {
+  const ta = $('#freePrompt'), m = $('#freeMsg');
+  try { await navigator.clipboard.writeText(ta.value); m.textContent = 'Kopyalandı.'; m.className = 'msg good'; }
+  catch (e) { ta.focus(); ta.select(); m.textContent = 'Metin seçildi; Ctrl+C ile kopyalayın.'; m.className = 'msg'; }
+};
 $('#apiDel').onclick = () => { lsSet(API_KEY_K, ''); $('#apiMsg').textContent = 'Anahtar bu bilgisayardan silindi.'; $('#apiMsg').className = 'msg'; setupApi(); };
 const dm = (t, c='') => { const m = $('#docMsg'); m.textContent = t; m.className = 'msg ' + c; };
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -960,7 +982,7 @@ async function openFile(f){
       const bmp = await createImageBitmap(f, { imageOrientation: 'from-image' });
       const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height; c.getContext('2d').drawImage(bmp, 0, 0);
       doc = { kind:'img', name:f.name, canvas:c, lines:[] }; showPreview(c);
-      dm(f.name + (sample ? ' yüklendi. "Belgeyi oku"ya basın.' : ' yüklendi. Otomatik okuma kapalı: API anahtarı girin ya da koordinatları önizlemeye bakarak tabloya girin.'), 'good');
+      dm(f.name + (sample ? ' yüklendi. "Belgeyi oku"ya basın.' : ' yüklendi. Koordinatları "Anahtarsız okuma" ile alın, önizlemeye bakarak tabloya girin ya da API anahtarı ekleyin.'), 'good');
     }
     updButtons();
 
@@ -984,7 +1006,7 @@ async function renderPage(n){
   doc.lines = rows.map(r => r.items.sort((a, b) => a.x - b.x).map(i => i.s).join('  '));
   showPreview(c); updButtons();
   const hasT = doc.lines.length > 3;
-  dm(doc.name + ' · ' + doc.pages + ' sayfa · ' + (hasT ? 'metinli PDF' : 'taranmış PDF') + (sample ? '. "Belgeyi oku"ya basın.' : (hasT ? '. "PDF\'ten koordinatları al"a basın; sonuçları belgeyle karşılaştırın.' : '. Otomatik okuma kapalı: API anahtarı girin ya da koordinatları önizlemeye bakarak tabloya girin.')), 'good');
+  dm(doc.name + ' · ' + doc.pages + ' sayfa · ' + (hasT ? 'metinli PDF' : 'taranmış PDF') + (sample ? '. "Belgeyi oku"ya basın.' : (hasT ? '. "PDF\'ten koordinatları al"a basın; sonuçları belgeyle karşılaştırın.' : '. Koordinatları "Anahtarsız okuma" ile alın, önizlemeye bakarak tabloya girin ya da API anahtarı ekleyin.')), 'good');
 }
 function showPreview(c){
   const p = $('#prev'), w = Math.min(2400, c.width), s = w / c.width;
@@ -1103,9 +1125,10 @@ if (STANDALONE) {
   } };
   document.querySelectorAll('.dl').forEach(b => b.hidden = false);
   $('#readBtn').textContent = "PDF'ten koordinatları al"; setupApi();
+  $('#freeBox').hidden = false;
   $('#nczDesc').textContent = 'PARSEL katmanında adlı parsel alanları, NOKTA katmanında adlı köşe noktaları. Doğrudan .ncz iner.';
   $('#nczNote').textContent = 'NCZ, Netcad 8.5.6’nın kendi ürettiği örnek proje dosyasının yapısıyla yazılır: katmanlar 0, PARSEL, NOKTA. Dosya doğrudan .ncz olarak iner.';
-  $('#docMsg').textContent = sample ? 'Belge yükleyin ve "Belgeyi oku"ya basın.' : 'Belge yükleyin. Taranmış belgeleri otomatik okumak için aşağıdan API anahtarını bir kez girin; anahtar yoksa koordinatları önizlemeye bakarak tabloya girin.';
+  $('#docMsg').textContent = sample ? 'Belge yükleyin ve "Belgeyi oku"ya basın.' : 'Belge yükleyin. Metinli PDF koordinatları doğrudan okunur; taranmış belgeler için "Anahtarsız okuma" adımlarını izleyin ya da API anahtarı ekleyin.';
 }
 })();
 </script>
