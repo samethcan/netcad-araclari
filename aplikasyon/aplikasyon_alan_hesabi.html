@@ -1,0 +1,1113 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Aplikasyon Alan Hesabı</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: two-column workbench — input (belge → bilgi → noktalar → alanlar) left, results (kontrol → çizim → kenarlar → aktar) right; stacks on phone */
+:root{
+  --bg:#eaeef2; --panel:#ffffff; --sunk:#f4f6f8; --ink:#16202a; --muted:#5a6774; --line:#d2d9e0;
+  --accent:#0c5b8a; --accent-ink:#ffffff; --parcel:#b3261e; --parcel-fill:rgba(179,38,30,.08);
+  --ok:#2b7a4b; --ok-bg:rgba(43,122,75,.12); --warn:#9a5800; --warn-bg:rgba(154,88,0,.12); --grid:#dde3e9;
+  --f-head:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --panel:#161f28; --sunk:#111920; --ink:#e2e8ee; --muted:#93a0ad; --line:#293541;
+  --accent:#5aaee3; --accent-ink:#071520; --parcel:#ff6f61; --parcel-fill:rgba(255,111,97,.10);
+  --ok:#5cc28a; --ok-bg:rgba(92,194,138,.14); --warn:#e6a33a; --warn-bg:rgba(230,163,58,.14); --grid:#1f2a35; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --panel:#161f28; --sunk:#111920; --ink:#e2e8ee; --muted:#93a0ad; --line:#293541;
+  --accent:#5aaee3; --accent-ink:#071520; --parcel:#ff6f61; --parcel-fill:rgba(255,111,97,.10);
+  --ok:#5cc28a; --ok-bg:rgba(92,194,138,.14); --warn:#e6a33a; --warn-bg:rgba(230,163,58,.14); --grid:#1f2a35; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{border-bottom:1px solid var(--line);background:var(--panel)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding-block:14px}
+h1{font-family:var(--f-head);font-weight:600;font-size:22px;margin:0;letter-spacing:.01em;text-wrap:balance}
+.sub{margin:2px 0 0;color:var(--muted);font-size:13px}
+.badge{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--warn);color:var(--warn);font-weight:500}
+main.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:18px;padding-block:18px 24px}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+@media (max-width:920px){main.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+.card h2{font-family:var(--f-head);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.card h2 .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:13px;font-weight:500;border-radius:7px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+input.bad{border-color:var(--parcel);background:var(--parcel-fill)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1.5px dashed var(--line);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:var(--sunk)}
+.drop.over{border-color:var(--accent)}
+.drop strong{font-weight:600}
+.drop span{color:var(--muted);font-size:12px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.preview{margin-top:12px;border:1px solid var(--line);border-radius:6px;max-height:560px;overflow:auto;background:#fff;cursor:zoom-in}
+.preview canvas{display:block;width:100%;height:auto}
+.preview.zoom{cursor:zoom-out}
+.preview.zoom canvas{width:250%;max-width:none}
+.msg{margin:10px 0 0;font-size:13px;color:var(--muted);min-height:1.2em}
+.msg.err{color:var(--parcel)} .msg.good{color:var(--ok)} .msg.busy{color:var(--accent);font-weight:500}
+.tblwrap{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:4px;border-bottom:1px solid var(--line);vertical-align:middle}
+th.r,td.r{text-align:right}
+#ptTable{min-width:470px}
+#ptTable td.idx{color:var(--muted);font-family:var(--f-mono);font-size:12px;width:26px}
+#ptTable input.in-no{width:5.5em}
+#ptTable input.in-c{font-family:var(--f-mono);font-size:13px;min-width:8.5em}
+#ptTable td.ck{text-align:center;width:36px} #ptTable td.ck input{width:16px;height:16px;accent-color:var(--ok)}
+td.act{white-space:nowrap;width:1%}
+td.act button{padding:3px 7px;font-size:12px}
+tr.doubt td{background:var(--parcel-fill)}
+#pcTable{min-width:800px}
+#pcTable input.in-nm{min-width:6.5em}
+#pcTable input.in-seq{font-family:var(--f-mono);font-size:13px;min-width:12em}
+#pcTable input.in-doc{font-family:var(--f-mono);font-size:13px;min-width:5.5em;text-align:right}
+details.paste{margin-top:12px}
+details.paste summary{cursor:pointer;color:var(--accent);font-weight:500}
+details.paste textarea{font-family:var(--f-mono);font-size:12.5px;min-height:110px;margin-top:8px}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{min-width:0}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.stat .v{font-family:var(--f-head);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.2;overflow-wrap:anywhere}
+.stat .s{font-size:12px;color:var(--muted)}
+.v.ok{color:var(--ok)} .v.pos{color:var(--warn)}
+#resTable{min-width:760px}
+#resTable td{font-family:var(--f-mono);font-size:13px}
+#resTable td.nm{font-family:var(--f-body);font-weight:600}
+#resTable tr{cursor:pointer}
+#resTable tr.sel td{background:var(--sunk)}
+#resTable tfoot td{font-weight:600;border-bottom:none}
+.chip{display:inline-block;font-family:var(--f-body);font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:var(--ok-bg)} .chip.bad{color:var(--warn);background:var(--warn-bg)} .chip.na{color:var(--muted);background:var(--sunk)} .chip.err{color:var(--parcel);background:var(--parcel-fill)}
+.tol{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.tol input{width:5.5em;font-family:var(--f-mono);text-align:right}
+ul.warn{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:6px}
+ul.warn li{font-size:13px;padding:6px 10px;border-radius:6px;border-left:3px solid var(--warn);background:var(--sunk)}
+ul.warn li.e{border-left-color:var(--parcel)} ul.warn li.i{border-left-color:var(--accent)}
+.plotwrap{border:1px solid var(--line);border-radius:8px;background:var(--sunk);overflow:hidden}
+#plot{display:block;width:100%;height:auto;max-width:100%}
+#plot .g-line{stroke:var(--grid);stroke-width:1}
+#plot .g-txt{fill:var(--muted);font-family:var(--f-mono);font-size:9.5px}
+#plot .poly{fill:var(--parcel-fill);stroke:var(--parcel);stroke-width:1.6;stroke-linejoin:round;cursor:pointer}
+#plot .poly.sel{stroke-width:3;fill:rgba(12,91,138,.12);stroke:var(--accent)}
+#plot .pt{fill:var(--panel);stroke:var(--ink);stroke-width:1.5}
+#plot .pt-no{fill:var(--ink);font-family:var(--f-mono);font-size:11px;font-weight:500}
+#plot .e-len{fill:var(--accent);font-family:var(--f-mono);font-size:10.5px}
+#plot .c-t1{fill:var(--ink);font-family:var(--f-head);font-weight:600;font-size:14px}
+#plot .c-t2{fill:var(--parcel);font-family:var(--f-head);font-weight:600;font-size:12.5px}
+#plot .t-muted{fill:var(--muted);font-size:13px}
+#plot .na{fill:var(--ink)} #plot .na-t{fill:var(--ink);font-family:var(--f-head);font-weight:600;font-size:12px}
+#plot .sb{stroke:var(--ink);stroke-width:2;fill:none} #plot .sb-t{fill:var(--ink);font-family:var(--f-mono);font-size:10px}
+#plot .x-mark{stroke:var(--warn);stroke-width:2;fill:none}
+.plotbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-size:13px}
+.plotbar label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.plotbar input{width:auto}
+a{color:var(--accent)}
+#edgeTable td{font-family:var(--f-mono);font-size:13px}
+#edgeTable td:first-child{font-family:var(--f-body)}
+.exp{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.exp .grp{border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.exp .grp.main{border-color:var(--accent)}
+.exp .grp b{font-family:var(--f-head);font-weight:600;font-size:14px}
+.exp .grp p{margin:0;font-size:12px;color:var(--muted)}
+.exp .grp .row button{flex:1}
+#out{font-family:var(--f-mono);font-size:12px;min-height:120px;margin-top:12px;white-space:pre;overflow:auto}
+.note{font-size:12.5px;color:var(--muted);margin:10px 0 0;padding:8px 10px;border-radius:6px;background:var(--sunk)}
+.sig{padding-block:0 14px;text-align:right;font-size:9px;letter-spacing:.06em;color:var(--muted);opacity:.45}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+
+<header class="top"><div class="wrap">
+  <div>
+    <h1>Aplikasyon Alan Hesabı</h1>
+    <p class="sub">Belgeyi oku · alanları kapat · belgedeki m² ile kontrol et · Netcad NCZ al</p>
+  </div>
+  <span class="badge" id="exBadge" hidden>Örnek veri gösteriliyor</span>
+</div></header>
+
+<main class="wrap grid">
+<section class="col">
+
+  <div class="card">
+    <h2><span class="n">1</span>Aplikasyon belgesi</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept=".pdf,application/pdf,image/*">
+      <strong>PDF veya fotoğraf seçin</strong>
+      <span>Belgeyi buraya bırakın ya da tıklayın</span>
+    </label>
+    <div class="row" style="margin-top:10px">
+      <select id="pageSel" style="width:auto" hidden aria-label="Sayfa"></select>
+      <button class="primary" id="aiBtn" disabled>Belgeyi oku</button>
+      <button id="readBtn" disabled title="Yalnız metin katmanlı PDF'lerde koordinat tablosunu alır; alan listesini okumaz">Sadece koordinatları al</button>
+      <button id="stopBtn" hidden>Durdur</button>
+    </div>
+    <p class="msg" id="docMsg">Belge yüklenmedi. Koordinatları ve alanları aşağıya elle de girebilirsiniz.</p>
+    <details class="paste" id="apiBox" hidden>
+      <summary id="apiSum">Otomatik okumayı aç (yapay zekâ API anahtarı)</summary>
+      <p class="hint">Taranmış belgeleri bu bilgisayarda otomatik okumak için Anthropic API anahtarınızı bir kez girin. Anahtar yalnızca bu bilgisayarın tarayıcısında saklanır; HTML dosyasına yazılmaz, dosyayı başkasına verdiğinizde gitmez.</p>
+      <div class="row" style="margin-top:8px">
+        <input id="apiKey" type="password" placeholder="sk-ant-…" autocomplete="off" style="flex:1;min-width:12em" aria-label="API anahtarı">
+        <select id="apiModel" style="width:auto" aria-label="Model"><option value="claude-opus-5-5">En doğru (Opus)</option><option value="claude-sonnet-5-5">Daha hızlı (Sonnet)</option></select>
+        <button class="primary" id="apiSave">Kaydet</button>
+        <button id="apiDel">Anahtarı sil</button>
+      </div>
+      <p class="msg" id="apiMsg"></p>
+    </details>
+    <div class="preview" id="prevWrap" hidden title="Yakınlaştırmak için tıklayın"><canvas id="prev"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2</span>Konum</h2>
+    <div class="fields">
+      <label class="f">İl<input id="m-il"></label>
+      <label class="f">İlçe<input id="m-ilce"></label>
+      <label class="f">Mahalle / Köy<input id="m-mahalle"></label>
+      <label class="f">Ada<input id="m-ada" inputmode="numeric"></label>
+      <label class="f">Datum<select id="m-datum"></select></label>
+      <label class="f">DOM / Dilim<select id="m-dom"></select></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3</span>Noktalar</h2>
+    <div class="row">
+      <button id="addBtn">Nokta ekle</button>
+      <button id="swapBtn" title="Y ve X sütunlarını yer değiştir">Y ↔ X</button>
+      <select id="setSel" style="width:auto" hidden aria-label="Koordinat takımı"></select>
+      <button id="clrBtn">Yeni belge</button>
+    </div>
+    <div class="tblwrap">
+      <table id="ptTable">
+        <thead><tr><th>#</th><th>Nokta</th><th>Y (sağa)</th><th>X (yukarı)</th><th title="Belgeyle karşılaştırıldı">Kontrol</th><th></th></tr></thead>
+        <tbody id="ptBody"></tbody>
+      </table>
+    </div>
+    <p class="hint">Hızlı giriş: Enter ile Nokta → Y → X arasında ilerleyin; son satırda Enter yeni satır açar.</p>
+    <details class="paste">
+      <summary>Metinden yapıştır</summary>
+      <textarea id="pasteTxt" placeholder="Her satıra bir nokta:&#10;K1  1000.00  2015.00&#10;K2  1010.00  2015.00"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" id="pasteBtn">Tabloya aktar</button>
+        <span class="hint" style="margin:0">Biçim: Nokta Y X (boşluk, sekme veya ; ayraçlı; Excel’den kopyalanabilir; virgüllü ondalık olur)</span>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">4</span>Alanlar</h2>
+    <div class="row">
+      <button id="addPcBtn">Alan ekle</button>
+      <button id="allPcBtn" title="Tüm noktalardan, tablo sırasıyla tek alan oluşturur">Tüm noktalardan tek alan</button>
+    </div>
+    <div class="tblwrap">
+      <table id="pcTable">
+        <thead><tr><th>Alan adı</th><th>Köşe noktaları (sırayla)</th><th class="r" title="Belgedeki hesap alanı">Hesap alanı</th><th class="r">Tapu alanı</th><th class="r">Yanılma sınırı</th><th class="r">İç alan</th><th class="r">Dış alan</th><th></th></tr></thead>
+        <tbody id="pcBody"></tbody>
+      </table>
+    </div>
+    <p class="hint">Köşeleri sınır boyunca sırayla yazın: K1-K2-K10-K11-K12. Alan kendiliğinden kapanır. Alan değerleri belgedeki m²’dir.</p>
+  </div>
+
+</section>
+<section class="col">
+
+  <div class="card">
+    <h2><span class="n">5</span>Alan kontrolü</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Alan sayısı</div><div class="v" id="sCnt">–</div><div class="s" id="sCntS"></div></div>
+      <div class="stat"><div class="k">Hesap alanı uyumlu</div><div class="v" id="sOk">–</div><div class="s" id="sOkS">tolerans içinde</div></div>
+      <div class="stat"><div class="k">Tapu farkı sınır içinde</div><div class="v" id="sBad">–</div><div class="s" id="sBadS">yanılma sınırına göre</div></div>
+      <div class="stat"><div class="k">Toplam alan</div><div class="v" id="sSum">–</div><div class="s" id="sSumS"></div></div>
+    </div>
+    <div class="tblwrap">
+      <table id="resTable">
+        <thead><tr><th>Alan</th><th class="r">Hesaplanan m²</th><th class="r">Belge hesap m²</th><th class="r">Fark</th><th>Hesap kontrolü</th><th class="r">Tapu m²</th><th class="r">Tapu farkı</th><th class="r">Sınır / iç–dış</th><th>Tapu kontrolü</th></tr></thead>
+        <tbody id="resBody"></tbody>
+        <tfoot id="resFoot"></tfoot>
+      </table>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:10px">
+      <label class="tol" for="tol">Hesap toleransı ±<input id="tol" inputmode="decimal" value="0.10"> m²</label>
+      <span class="hint" style="margin:0">Satıra tıklayınca alan çizimde ve kenar tablosunda seçilir.</span>
+    </div>
+    <ul class="warn" id="warns"></ul>
+  </div>
+
+  <div class="card">
+    <h2>Çizim</h2>
+    <div class="plotwrap"><svg id="plot" viewBox="0 0 640 460" role="img" aria-label="Alan çizimi"></svg></div>
+    <div class="plotbar">
+      <label><input type="checkbox" id="showLen" checked> Seçili alanın kenar uzunlukları</label>
+      <span id="geo"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Kenarlar <span id="edgeTitle" style="text-transform:none;letter-spacing:0;color:var(--ink)"></span></h2>
+    <div class="tblwrap">
+      <table id="edgeTable">
+        <thead><tr><th>Kenar</th><th class="r">Uzunluk (m)</th><th class="r">Semt (grad)</th><th class="r">ΔY</th><th class="r">ΔX</th></tr></thead>
+        <tbody id="edgeBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">6</span>Netcad'e aktar</h2>
+    <div class="exp">
+      <div class="grp main"><b>NCZ (Netcad)</b><p id="nczDesc">PARSEL katmanında adlı parsel alanları, NOKTA katmanında adlı köşe noktaları. Zip içinde .ncz iner.</p>
+        <div class="row"><button class="primary dl" id="nczBtn">NCZ indir</button></div></div>
+      <div class="grp"><b>DXF çizim</b><p>Aynı içerik, katmanlı DXF.</p>
+        <div class="row"><button data-x="dxf" data-a="copy">Kopyala</button><button class="dl" data-x="dxf" data-a="save">İndir</button></div></div>
+      <div class="grp"><b>NCN nokta dosyası</b><p>Netcad nokta formatı: Ad Y X Z.</p>
+        <div class="row"><button data-x="ncn" data-a="copy">Kopyala</button><button class="dl" data-x="ncn" data-a="save">İndir</button></div></div>
+      <div class="grp"><b>Kontrol raporu</b><p>Koordinatlar, alanlar, belge farkları.</p>
+        <div class="row"><button data-x="rap" data-a="copy">Kopyala</button><button class="dl" data-x="rap" data-a="save">İndir</button></div></div>
+    </div>
+    <textarea id="out" readonly aria-label="Dışa aktarma içeriği" hidden></textarea>
+    <p class="msg" id="expMsg"></p>
+    <p class="note" id="nczNote">NCZ, Netcad 8.5.6’nın kendi ürettiği örnek proje dosyasının yapısıyla yazılır: katmanlar 0, PARSEL, NOKTA. Tarayıcı .ncz uzantısını doğrudan indirmeye izin vermediği için dosya zip içinde gelir; zip’i açıp .ncz’yi Netcad’de açın.</p>
+  </div>
+
+</section>
+</main>
+
+
+<script>
+/* ---------- NCZ yazıcı: Netcad 8.5.6 şablonundan kopyalama ---------- */
+const NCZ = (() => {
+  const enc1254 = (s, n) => {
+    const map = { 'Ç':0xC7,'ç':0xE7,'Ğ':0xD0,'ğ':0xF0,'İ':0xDD,'ı':0xFD,'Ö':0xD6,'ö':0xF6,'Ş':0xDE,'ş':0xFE,'Ü':0xDC,'ü':0xFC };
+    const out = [];
+    for (const ch of String(s)) { const c = ch.charCodeAt(0); out.push(map[ch] ?? (c < 128 ? c : 0x3F)); }
+    return Uint8Array.from(out.slice(0, n));
+  };
+  function walk(b) {
+    const dv = new DataView(b.buffer, b.byteOffset, b.byteLength), out = []; let p = 0;
+    while (p + 5 <= b.length) { const n = dv.getUint32(p + 1, true) + 5; if (n < 5 || p + n > b.length) throw new Error('şablon bozuk'); out.push({ o: p, k: b[p], n }); p += n; }
+    return out;
+  }
+  function parts(t) {
+    const bl = walk(t), first = bl.find(x => x.k === 21 || x.k === 22).o, P = {};
+    for (const { o, k, n } of bl) if (k === 21 && !P[t[o + 6]]) P[t[o + 6]] = t.slice(o, o + n);
+    return { head: t.slice(0, first), bl: bl.filter(x => x.o < first), P };
+  }
+  function poly(proto, ring, label) {            // ring: [[X north, Y east]...] closed
+    const r = new Uint8Array(113 + 24 * ring.length); r.set(proto.slice(0, 113));
+    const dv = new DataView(r.buffer), xs = ring.map(q => q[0]), ys = ring.map(q => q[1]);
+    [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)].forEach((v, i) => dv.setFloat64(50 + 8 * i, v, true));
+    r.fill(0, 86, 101); const lb = enc1254(label, 14); r[86] = lb.length; r.set(lb, 87);
+    ring.forEach(([X, Y], i) => { dv.setFloat64(113 + 24 * i, X, true); dv.setFloat64(121 + 24 * i, Y, true); dv.setFloat64(129 + 24 * i, 0, true); });
+    dv.setUint32(1, r.length - 5, true);
+    return r;
+  }
+  function point(proto, X, Y, name) {
+    const r = proto.slice(), dv = new DataView(r.buffer), d = 1e-8;
+    dv.setFloat64(8, X, true); dv.setFloat64(16, Y, true);
+    [X - d, Y - d, X + d, Y + d].forEach((v, i) => dv.setFloat64(50 + 8 * i, v, true));
+    r.fill(0, 86, 107); const nb = enc1254(name, 20); r[86] = nb.length; r.set(nb, 87);
+    return r;
+  }
+  /* polys: [{label, ring:[[Y,X]...]}] (open ring), points: [{name, y, x}] */
+  function build(template, polys, points) {
+    const { head, bl, P } = parts(template), h = head.slice(), hv = new DataView(h.buffer);
+    const geoms = [];
+    for (const p of polys) { const ring = p.ring.map(([y, x]) => [x, y]); ring.push(ring[0]); geoms.push(poly(P[7], ring, p.label)); }
+    for (const q of points) geoms.push(point(P[1], q.x, q.y, q.name));
+    const xs = [...polys.flatMap(p => p.ring.map(r => r[1])), ...points.map(q => q.x)];
+    const ys = [...polys.flatMap(p => p.ring.map(r => r[0])), ...points.map(q => q.y)];
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    for (const { o, k, n } of bl) {
+      if (k === 4) {
+        const m = Math.max(x1 - x0, y1 - y0, 10) * 0.05, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hx = (x1 - x0) / 2 + m, hy = (y1 - y0) / 2 + m;
+        [cx - hx, cy - hy, cx + hx, cy + hy].forEach((v, i) => hv.setFloat64(o + 5 + 8 * i, v, true));
+      }
+    }
+    const chunks = [h, ...geoms, P[14]], out = new Uint8Array(chunks.reduce((s, c) => s + c.length, 0));
+    let q = 0; for (const c of chunks) { out.set(c, q); q += c.length; }
+    const dv = new DataView(out.buffer);
+    dv.setUint32(5, out.length, true);
+    [x0, y0, x1, y1].forEach((v, i) => dv.setFloat64(49 + 8 * i, v, true));
+    dv.setUint32(81, geoms.length, true);
+    return out;
+  }
+  return { build };
+})();
+
+/* ---------- zip (saklama, sıkıştırmasız) ---------- */
+const ZIP = (() => {
+  const T = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; T[n] = c >>> 0; }
+  const crc = d => { let c = 0xFFFFFFFF; for (let i = 0; i < d.length; i++) c = T[(c ^ d[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const nameBytes = s => Uint8Array.from(String(s).replace(/[^\x20-\x7E]/g, '_'), ch => ch.charCodeAt(0));
+  function make(files) {
+    const now = new Date(), dt = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF, dd = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+    const parts = [], central = []; let off = 0;
+    for (const f of files) {
+      const nm = nameBytes(f.name), c = crc(f.data), sz = f.data.length;
+      const lh = new Uint8Array(30 + nm.length), v = new DataView(lh.buffer);
+      v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(10, dt, true); v.setUint16(12, dd, true); v.setUint32(14, c, true); v.setUint32(18, sz, true); v.setUint32(22, sz, true); v.setUint16(26, nm.length, true); lh.set(nm, 30);
+      const ch = new Uint8Array(46 + nm.length), w = new DataView(ch.buffer);
+      w.setUint32(0, 0x02014b50, true); w.setUint16(4, 20, true); w.setUint16(6, 20, true); w.setUint16(12, dt, true); w.setUint16(14, dd, true); w.setUint32(16, c, true); w.setUint32(20, sz, true); w.setUint32(24, sz, true); w.setUint16(28, nm.length, true); w.setUint32(42, off, true); ch.set(nm, 46);
+      parts.push(lh, f.data); central.push(ch); off += lh.length + sz;
+    }
+    const cd = central.reduce((s, c) => s + c.length, 0), end = new Uint8Array(22), e = new DataView(end.buffer);
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cd, true); e.setUint32(16, off, true);
+    const all = [...parts, ...central, end], out = new Uint8Array(all.reduce((s, c) => s + c.length, 0)); let q = 0; for (const c of all) { out.set(c, q); q += c.length; }
+    return out;
+  }
+  return { make };
+})();
+
+const NCZ_TEMPLATE_GZ = "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";
+let templateBytes = null;
+async function getTemplate(){
+  if (templateBytes) return templateBytes;
+  const bin = Uint8Array.from(atob(NCZ_TEMPLATE_GZ), c => c.charCodeAt(0));
+  const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'));
+  templateBytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  return templateBytes;
+}
+
+const STANDALONE = true;
+(() => {
+const $ = s => document.querySelector(s);
+const KEY = 'aplikasyon-alan-v3';
+const DATUMS = {
+  ITRF96_3: { label: 'ITRF96 (TUREF) · 3°', doms: [27,30,33,36,39,42,45] },
+  ED50_3:   { label: 'ED50 · 3°', doms: [27,30,33,36,39,42,45] },
+  ED50_6:   { label: 'ED50 · UTM 6°', doms: [27,33,39,45], zone: {27:35,33:36,39:37,45:38} }
+};
+const SAMPLE = {
+  example: true,
+  meta: { il:'', ilce:'', mahalle:'Örnek', ada:'100', datum:'ITRF96_3', dom:'27' },
+  pts: [
+    ['K1','1000.00','2015.00'],['K2','1010.00','2015.00'],['K3','1020.00','2015.00'],['K4','1030.00','2015.00'],
+    ['K5','1030.00','2000.00'],['K6','1020.00','2000.00'],['K7','1010.00','2000.00'],['K8','1000.00','2000.00']
+  ].map(([no, y, x]) => ({ no, y, x, ok:true })),
+  parcels: [
+    { name:'100/1', seq:'K1-K2-K7-K8', doc:'150.00', tapu:'150.50', lim:'2.80' },
+    { name:'100/2', seq:'K2-K3-K6-K7', doc:'150.00', tapu:'149.60', lim:'2.80' },
+    { name:'100/3', seq:'K3-K4-K5-K6', doc:'150.00', tapu:'151.00', lim:'2.80' }
+  ],
+  tol: '0.10', sel: 0, showLen: true
+};
+
+let state = load();
+let notices = [];
+function load(){
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.pts) && Array.isArray(s.parcels) && s.meta) return s; } catch(e) {}
+  return JSON.parse(JSON.stringify(SAMPLE));
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+function touched(){ if (state.example){ state.example = false; $('#exBadge').hidden = true; } }
+
+/* ---------- sayılar ---------- */
+function parseNum(v){
+  if (typeof v === 'number') return v;
+  let s = String(v ?? '').trim().replace(/\s/g, '').replace(/m2|m²/gi, '');
+  if (!s) return NaN;
+  if (s.includes('.') && s.includes(',')) s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
+  else if (s.includes(',')) s = s.replace(',', '.');
+  if (!/^[-+]?\d*\.?\d+$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+const fmt = (v, d=2) => Number.isFinite(v) ? v.toLocaleString('tr-TR', { minimumFractionDigits:d, maximumFractionDigits:d }) : '–';
+const sgn = (v, d=2) => { if (!Number.isFinite(v)) return '–'; const r = +v.toFixed(d) || 0; return (r > 0 ? '+' : '') + fmt(r, d); };
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isE = v => v >= 100000 && v < 1000000;
+const isN = v => v >= 3800000 && v < 4800000;
+const splitSeq = s => String(s ?? '').split(/[\s,;\-–—>→]+/).map(t => t.trim()).filter(Boolean);
+
+/* ---------- metinden nokta ---------- */
+function genericParse(text){
+  const out = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    let t = /[;\t]/.test(line) ? line.split(/[;\t]+/) : line.split(/\s+/);
+    t = t.map(s => s.trim()).filter(Boolean);
+    if (t.length >= 3) { const y = parseNum(t[1]), x = parseNum(t[2]); if (Number.isFinite(y) && Number.isFinite(x)) out.push({ no: t[0], y, x }); }
+  }
+  return out;
+}
+const isDec = t => /^[-+]?\d{2,7}[.,]\d{1,4}$/.test(t);
+function localParse(lines){
+  const out = [], seen = new Set();
+  for (const line of lines) {
+    const t = line.split(/[\s;|]+/).filter(Boolean);
+    for (let i = 1; i < t.length - 1; i++) {
+      if (!isDec(t[i]) || !isDec(t[i+1]) || isDec(t[i-1])) continue;
+      const y = parseNum(t[i]), x = parseNum(t[i+1]);
+      if (!(Math.abs(y) >= 100 && Math.abs(x) >= 100) || !/^[A-Za-zÇĞİÖŞÜçğıöşü]*\d+[A-Za-z0-9/]*$/.test(t[i-1]) || /^0\d/.test(t[i-1]) || t[i-1].length > 12) continue;
+      const k = y.toFixed(3) + ',' + x.toFixed(3);
+      if (!seen.has(k)) { seen.add(k); out.push({ no: t[i-1].replace(/[:)]$/, ''), y, x }); }
+      i++;
+    }
+  }
+  return out;
+}
+function rangeParse(lines){
+  const out = [], seen = new Set();
+  for (const line of lines) {
+    const t = line.split(/[\s;|]+/).filter(Boolean), n = t.map(parseNum);
+    for (let i = 0; i < t.length - 1; i++) {
+      const a = n[i], b = n[i+1]; let y, x;
+      if (isE(a) && isN(b)) { y = a; x = b; } else if (isN(a) && isE(b)) { y = b; x = a; } else continue;
+      let no = '';
+      if (i > 0 && !(isE(n[i-1]) || isN(n[i-1])) && t[i-1].length <= 10) no = t[i-1].replace(/[:.)]$/, '');
+      const k = y.toFixed(3) + ',' + x.toFixed(3);
+      if (!seen.has(k)) { seen.add(k); out.push({ no, y, x }); }
+      i++;
+    }
+  }
+  return out;
+}
+function fixSwap(pts){
+  const sw = pts.filter(p => p.y >= 1e6 && p.x < 1e6).length;
+  if (sw > pts.length / 2) { pts.forEach(p => { const t = p.y; p.y = p.x; p.x = t; }); return true; }
+  return false;
+}
+function setPoints(list){
+  const swapped = fixSwap(list);
+  state.pts = list.map((p, i) => ({ no: String(p.no || (i+1)), y: String(p.y), x: String(p.x), ok: false, doubt: !!p.doubt }));
+  if (swapped) notices.push({ c:'i', t:'Y ve X sütunları ters gelmişti, otomatik düzeltildi.' });
+}
+function allPointsParcel(name){
+  return { name: name || state.meta.ada || 'Alan 1', seq: state.pts.map(p => p.no).join('-'), doc: '', tapu: '', lim: '', ic: '', dis: '' };
+}
+
+/* ---------- datum / DOM ---------- */
+function fillDatum(){
+  const ds = $('#m-datum'); ds.innerHTML = Object.entries(DATUMS).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('');
+  ds.value = state.meta.datum in DATUMS ? state.meta.datum : 'ITRF96_3'; fillDom();
+}
+function fillDom(){
+  const d = DATUMS[$('#m-datum').value], s = $('#m-dom');
+  s.innerHTML = d.doms.map(m => `<option value="${m}">${d.zone ? 'Zon ' + d.zone[m] + ' · DOM ' + m : 'DOM ' + m}</option>`).join('');
+  s.value = d.doms.includes(+state.meta.dom) ? String(state.meta.dom) : String(d.doms[0]);
+  state.meta.datum = $('#m-datum').value; state.meta.dom = s.value;
+}
+function projDef(){
+  const dt = state.meta.datum, dom = +state.meta.dom;
+  if (dt === 'ITRF96_3') return `+proj=tmerc +lat_0=0 +lon_0=${dom} +k=1 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs`;
+  const k = dt === 'ED50_6' ? 0.9996 : 1;
+  return `+proj=tmerc +lat_0=0 +lon_0=${dom} +k=${k} +x_0=500000 +y_0=0 +ellps=intl +towgs84=-87,-98,-121,0,0,0,0 +units=m +no_defs`;
+}
+function datumText(){ const d = DATUMS[state.meta.datum]; return d.label + ' · ' + (d.zone ? 'Zon ' + d.zone[state.meta.dom] + ' (DOM ' + state.meta.dom + ')' : 'DOM ' + state.meta.dom); }
+
+/* ---------- koordinat takımı ---------- */
+function renderSets(){
+  const sel = $('#setSel');
+  if (!state.sets) { sel.hidden = true; return; }
+  sel.innerHTML = Object.keys(state.sets).map(k => `<option value="${esc(k)}">${esc(k)} koordinatları</option>`).join('');
+  sel.value = state.setName; sel.hidden = false;
+}
+$('#setSel').addEventListener('change', () => {
+  const cur = state.setName, nxt = $('#setSel').value; if (!state.sets || cur === nxt) return;
+  state.sets[cur] = state.pts.map(p => ({ no: p.no, y: p.y, x: p.x }));
+  const m = new Map(state.sets[nxt].map(p => [p.no, p]));
+  state.pts = state.pts.map(p => m.has(p.no) ? { ...p, y: m.get(p.no).y, x: m.get(p.no).x, ok: false } : p);
+  state.setName = nxt; touched(); renderPts(); recompute();
+});
+
+/* ---------- nokta tablosu ---------- */
+function renderPts(){
+  $('#ptBody').innerHTML = state.pts.map((p, i) => `
+    <tr class="${p.doubt ? 'doubt' : ''}">
+      <td class="idx">${i+1}</td>
+      <td><input class="in-no" id="no-${i}" data-i="${i}" data-k="no" value="${esc(p.no)}" aria-label="Nokta adı ${i+1}"></td>
+      <td><input class="in-c" id="y-${i}" data-i="${i}" data-k="y" inputmode="decimal" value="${esc(p.y)}" aria-label="Y ${i+1}"></td>
+      <td><input class="in-c" id="x-${i}" data-i="${i}" data-k="x" inputmode="decimal" value="${esc(p.x)}" aria-label="X ${i+1}"></td>
+      <td class="ck"><input type="checkbox" id="ok-${i}" data-i="${i}" data-k="ok" ${p.ok ? 'checked' : ''} aria-label="Nokta ${i+1} kontrol edildi"></td>
+      <td class="act"><button data-act="del" data-i="${i}" aria-label="Sil">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="color:var(--muted)">Nokta yok.</td></tr>';
+  document.querySelectorAll('#ptBody input.in-c').forEach(el => el.classList.toggle('bad', el.value.trim() !== '' && !Number.isFinite(parseNum(el.value))));
+}
+$('#ptBody').addEventListener('input', e => {
+  const el = e.target, i = +el.dataset.i, k = el.dataset.k; if (!state.pts[i]) return;
+  if (k === 'ok') state.pts[i].ok = el.checked; else state.pts[i][k] = el.value;
+  if (k === 'y' || k === 'x') { state.pts[i].doubt = false; el.closest('tr').classList.remove('doubt'); el.classList.toggle('bad', el.value.trim() !== '' && !Number.isFinite(parseNum(el.value))); }
+  touched(); recompute();
+});
+$('#ptBody').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const el = e.target, i = +el.dataset.i, k = el.dataset.k; if (!state.pts[i]) return;
+  e.preventDefault();
+  const next = { no: 'y', y: 'x' }[k];
+  if (next) { $('#' + next + '-' + i)?.focus(); $('#' + next + '-' + i)?.select(); return; }
+  if (i === state.pts.length - 1) $('#addBtn').click(); else { $('#no-' + (i + 1))?.focus(); }
+});
+$('#ptBody').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act="del"]'); if (!b) return;
+  state.pts.splice(+b.dataset.i, 1); touched(); renderPts(); recompute();
+});
+$('#addBtn').onclick = () => {
+  const n = parseInt(state.pts.at(-1)?.no, 10);
+  state.pts.push({ no: Number.isFinite(n) ? String(n + 1) : String(state.pts.length + 1), y:'', x:'', ok:true });
+  touched(); renderPts(); recompute(); const nn = $('#no-' + (state.pts.length - 1)); nn.focus(); nn.select();
+};
+$('#swapBtn').onclick = () => { state.pts.forEach(p => { const t = p.y; p.y = p.x; p.x = t; }); touched(); renderPts(); recompute(); };
+let clrArm = 0;
+$('#clrBtn').onclick = e => {
+  const b = e.currentTarget;
+  if (Date.now() - clrArm > 3000) { clrArm = Date.now(); b.textContent = 'Silinsin mi? Tekrar tıklayın'; setTimeout(() => { b.textContent = 'Yeni belge'; }, 3000); return; }
+  clrArm = 0; b.textContent = 'Yeni belge';
+  state.pts = []; state.parcels = []; state.sel = 0; state.sets = null; notices = []; renderSets();
+  ['il','ilce','mahalle','ada'].forEach(k => { state.meta[k] = ''; $('#m-' + k).value = ''; });
+  touched(); renderPts(); renderPcs(); recompute();
+};
+$('#pasteBtn').onclick = () => {
+  const list = genericParse($('#pasteTxt').value);
+  if (!list.length) { $('#pasteTxt').classList.add('bad'); return; }
+  $('#pasteTxt').classList.remove('bad'); notices = [];
+  setPoints(list); state.pts.forEach(p => p.ok = true);
+  if (!state.parcels.length) state.parcels = [allPointsParcel()];
+  $('#pasteTxt').value = ''; touched(); renderPts(); renderPcs(); recompute();
+};
+
+/* ---------- alan tablosu ---------- */
+function renderPcs(){
+  $('#pcBody').innerHTML = state.parcels.map((c, i) => `
+    <tr>
+      <td><input class="in-nm" id="pn-${i}" data-i="${i}" data-k="name" value="${esc(c.name)}" aria-label="Alan adı ${i+1}"></td>
+      <td><input class="in-seq" id="ps-${i}" data-i="${i}" data-k="seq" value="${esc(c.seq)}" aria-label="Köşe noktaları ${i+1}"></td>
+      <td><input class="in-doc" id="pd-${i}" data-i="${i}" data-k="doc" inputmode="decimal" value="${esc(c.doc)}" aria-label="Belgedeki hesap alanı ${i+1}"></td>
+      <td><input class="in-doc" id="pt-${i}" data-i="${i}" data-k="tapu" inputmode="decimal" value="${esc(c.tapu)}" aria-label="Tapu alanı ${i+1}"></td>
+      <td><input class="in-doc" id="pl-${i}" data-i="${i}" data-k="lim" inputmode="decimal" value="${esc(c.lim)}" aria-label="Yanılma sınırı ${i+1}"></td>
+      <td><input class="in-doc" id="pi-${i}" data-i="${i}" data-k="ic" inputmode="decimal" value="${esc(c.ic)}" aria-label="İç alan ${i+1}"></td>
+      <td><input class="in-doc" id="po-${i}" data-i="${i}" data-k="dis" inputmode="decimal" value="${esc(c.dis)}" aria-label="Dış alan ${i+1}"></td>
+      <td class="act"><button data-act="del" data-i="${i}" aria-label="Alanı sil">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="8" style="color:var(--muted)">Alan tanımlı değil. "Alan ekle" ile ekleyin.</td></tr>';
+}
+$('#pcBody').addEventListener('input', e => {
+  const el = e.target, i = +el.dataset.i; if (!state.parcels[i]) return;
+  state.parcels[i][el.dataset.k] = el.value; touched(); recompute();
+});
+$('#pcBody').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act="del"]'); if (!b) return;
+  state.parcels.splice(+b.dataset.i, 1); state.sel = 0; touched(); renderPcs(); recompute();
+});
+$('#addPcBtn').onclick = () => { state.parcels.push({ name: (state.meta.ada ? state.meta.ada + '/' : 'Alan ') + (state.parcels.length + 1), seq: '', doc: '', tapu: '', lim: '', ic: '', dis: '' }); state.sel = state.parcels.length - 1; touched(); renderPcs(); recompute(); $('#ps-' + state.sel).focus(); };
+$('#allPcBtn').onclick = () => { state.parcels.push(allPointsParcel('Alan ' + (state.parcels.length + 1))); state.sel = state.parcels.length - 1; touched(); renderPcs(); recompute(); };
+
+/* ---------- konum ---------- */
+['il','ilce','mahalle','ada'].forEach(k => {
+  const el = $('#m-' + k); el.value = state.meta[k] ?? '';
+  el.addEventListener('input', () => { state.meta[k] = el.value; touched(); recompute(); });
+});
+$('#m-datum').addEventListener('change', () => { state.meta.datum = $('#m-datum').value; fillDom(); touched(); recompute(); });
+$('#m-dom').addEventListener('change', () => { state.meta.dom = $('#m-dom').value; touched(); recompute(); });
+$('#tol').value = state.tol ?? '0.10';
+$('#tol').addEventListener('input', () => { state.tol = $('#tol').value; recompute(); });
+$('#showLen').checked = state.showLen !== false;
+$('#showLen').addEventListener('change', () => { state.showLen = $('#showLen').checked; recompute(); });
+
+/* ---------- hesap ---------- */
+let PT = new Map(), PCS = [];
+function orient(a, b, c){ return (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0]); }
+function geom(P){
+  const n = P.length, r = { area:0, signed:0, per:0, edges:[], cx:NaN, cy:NaN, cross:[] };
+  if (n < 2) return r;
+  const e0 = P[0].y, n0 = P[0].x, q = P.map(p => [p.y - e0, p.x - n0]);
+  for (let i = 0; i < (n >= 3 ? n : 1); i++) {
+    const a = P[i], b = P[(i+1) % n], dE = b.y - a.y, dN = b.x - a.x, len = Math.hypot(dE, dN);
+    r.edges.push({ from:a.no, to:b.no, len, semt: ((Math.atan2(dE, dN) * 200 / Math.PI) + 400) % 400, dE, dN }); r.per += len;
+  }
+  if (n >= 3) {
+    let A = 0, Cx = 0, Cy = 0;
+    for (let i = 0; i < n; i++) { const [a,b] = q[i], [c,d] = q[(i+1) % n], cr = a*d - c*b; A += cr; Cx += (a+c)*cr; Cy += (b+d)*cr; }
+    A /= 2; r.signed = A; r.area = Math.abs(A);
+    if (Math.abs(A) > 1e-9) { r.cx = e0 + Cx / (6*A); r.cy = n0 + Cy / (6*A); }
+  }
+  if (!Number.isFinite(r.cx)) { r.cx = P.reduce((s,p) => s + p.y, 0) / n; r.cy = P.reduce((s,p) => s + p.x, 0) / n; }
+  if (n >= 4) for (let i = 0; i < n; i++) for (let j = i + 2; j < n; j++) {
+    if (i === 0 && j === n - 1) continue;
+    const a = q[i], b = q[(i+1)%n], c = q[j], d = q[(j+1)%n];
+    if (orient(a,b,c) * orient(a,b,d) < 0 && orient(c,d,a) * orient(c,d,b) < 0) r.cross.push([i, j]);
+  }
+  return r;
+}
+function recompute(){
+  PT = new Map();
+  const dupNames = [];
+  for (const p of state.pts) {
+    const y = parseNum(p.y), x = parseNum(p.x);
+    if (!Number.isFinite(y) || !Number.isFinite(x)) continue;
+    const k = String(p.no).trim();
+    if (PT.has(k)) dupNames.push(k);
+    PT.set(k, { no: k, y, x, ok: p.ok });
+  }
+  const tol = Math.abs(parseNum(state.tol)); const T = Number.isFinite(tol) ? tol : 0.10;
+  PCS = state.parcels.map((c, i) => {
+    let ids = splitSeq(c.seq);
+    if (ids.length > 3 && ids[0] === ids.at(-1)) ids = ids.slice(0, -1);
+    const missing = ids.filter(id => !PT.has(id));
+    const P = ids.filter(id => PT.has(id)).map(id => PT.get(id));
+    const g = geom(P), doc = parseNum(c.doc), tapu = parseNum(c.tapu), lim = parseNum(c.lim), ic = parseNum(c.ic), dis = parseNum(c.dis), okGeom = P.length >= 3 && !missing.length;
+    const diff = okGeom && Number.isFinite(doc) ? g.area - doc : NaN;
+    const tdiff = okGeom && Number.isFinite(tapu) ? tapu - g.area : NaN;
+    let status = 'na', tstat = 'na';
+    if (!okGeom) status = tstat = 'err';
+    else {
+      if (Number.isFinite(diff)) status = Math.abs(diff) <= T + 1e-9 ? 'ok' : 'bad';
+      if (Number.isFinite(tdiff) && Number.isFinite(lim)) tstat = Math.abs(tdiff) <= lim + 1e-9 ? 'ok' : 'bad';
+      else if (Number.isFinite(tapu) && Number.isFinite(ic) && Number.isFinite(dis)) tstat = tapu >= Math.min(ic, dis) - 1e-9 && tapu <= Math.max(ic, dis) + 1e-9 ? 'ok' : 'bad';
+    }
+    const limTxt = Number.isFinite(lim) ? '±' + fmt(lim) : (Number.isFinite(ic) && Number.isFinite(dis) ? fmt(Math.min(ic, dis)) + '–' + fmt(Math.max(ic, dis)) : '–');
+    return { i, name: c.name || ('Alan ' + (i+1)), ids, missing, P, g, doc, diff, tapu, lim, ic, dis, limTxt, tdiff, status, tstat };
+  });
+  if (state.sel >= PCS.length) state.sel = 0;
+
+  const valid = PCS.filter(p => p.P.length >= 3), sum = valid.reduce((s, p) => s + p.g.area, 0);
+  const docSum = valid.filter(p => Number.isFinite(p.doc)).reduce((s, p) => s + p.doc, 0);
+  const tapuSum = valid.filter(p => Number.isFinite(p.tapu)).reduce((s, p) => s + p.tapu, 0);
+  const nOk = PCS.filter(p => p.status === 'ok').length, nHas = PCS.filter(p => p.status === 'ok' || p.status === 'bad').length;
+  const tOk = PCS.filter(p => p.tstat === 'ok').length, tHas = PCS.filter(p => p.tstat === 'ok' || p.tstat === 'bad').length;
+  $('#sCnt').textContent = PCS.length || '–';
+  $('#sCntS').textContent = PT.size + ' nokta';
+  $('#sOk').textContent = nHas ? nOk + ' / ' + nHas : '–'; $('#sOk').className = 'v' + (nHas ? (nOk === nHas ? ' ok' : ' pos') : '');
+  $('#sBad').textContent = tHas ? tOk + ' / ' + tHas : '–'; $('#sBad').className = 'v' + (tHas ? (tOk === tHas ? ' ok' : ' pos') : '');
+  $('#sSum').textContent = valid.length ? fmt(sum) + ' m²' : '–';
+  $('#sSumS').textContent = docSum ? 'belgede ' + fmt(docSum) + ' m²' : '';
+
+  const chip = (st, p, okT, badT) => st === 'ok' ? `<span class="chip ok">${okT}</span>` : st === 'bad' ? `<span class="chip bad">${badT}</span>` : st === 'err' ? '<span class="chip err">' + (p.missing.length ? 'Nokta eksik' : 'Köşe yetersiz') + '</span>' : '<span class="chip na">Değer yok</span>';
+  $('#resBody').innerHTML = PCS.map(p => `<tr data-i="${p.i}" class="${p.i === state.sel ? 'sel' : ''}">
+      <td class="nm">${esc(p.name)}</td><td class="r">${p.P.length >= 3 ? fmt(p.g.area) : '–'}</td><td class="r">${fmt(p.doc)}</td>
+      <td class="r">${sgn(p.diff)}</td><td>${chip(p.status, p, 'Uyumlu', 'Fark var')}</td>
+      <td class="r">${fmt(p.tapu)}</td><td class="r">${sgn(p.tdiff)}</td><td class="r">${p.limTxt}</td><td>${chip(p.tstat, p, 'Sınır içinde', 'Sınırı aşıyor')}</td></tr>`).join('')
+    || '<tr><td colspan="9" style="color:var(--muted);font-family:var(--f-body)">Alan yok.</td></tr>';
+  $('#resFoot').innerHTML = valid.length > 1 ? `<tr><td>Toplam</td><td class="r">${fmt(sum)}</td><td class="r">${docSum ? fmt(docSum) : '–'}</td><td class="r">${docSum ? sgn(sum - docSum) : '–'}</td><td></td><td class="r">${tapuSum ? fmt(tapuSum) : '–'}</td><td class="r">${tapuSum ? sgn(tapuSum - sum) : '–'}</td><td></td><td></td></tr>` : '';
+
+  const W = [...notices];
+  const badRows = state.pts.filter(p => !Number.isFinite(parseNum(p.y)) || !Number.isFinite(parseNum(p.x))).length;
+  if (badRows) W.push({ c:'e', t: badRows + ' noktada Y veya X eksik ya da hatalı; hesaba katılmadı.' });
+  if (dupNames.length) W.push({ c:'e', t:'Aynı adlı noktalar var: ' + [...new Set(dupNames)].join(', ') + '. Son satır kullanıldı.' });
+  for (const p of PCS) {
+    if (p.missing.length) W.push({ c:'e', t: p.name + ': tabloda olmayan noktalar ' + p.missing.join(', ') + '.' });
+    else if (p.ids.length && p.P.length < 3) W.push({ c:'e', t: p.name + ': alan için en az 3 köşe gerekir.' });
+    if (p.g.cross.length) W.push({ c:'e', t: p.name + ': kenarlar kesişiyor; köşe sırası yanlış olabilir.' });
+  }
+  const doubt = state.pts.filter(p => p.doubt).map(p => p.no);
+  if (doubt.length) W.push({ c:'e', t:'Belgeden net okunamayan noktalar (kırmızı satır): ' + doubt.join(', ') + '. Belgeyle düzeltin.' });
+  const unchecked = state.pts.filter(p => !p.ok).length;
+  if (state.pts.length && unchecked) W.push({ c:'', t: unchecked + ' nokta henüz belgeyle karşılaştırılmadı (Kontrol kutusu boş).' });
+  geoCheck(W);
+  $('#warns').innerHTML = W.map(w => `<li class="${w.c}">${esc(w.t)}</li>`).join('');
+
+  const S = PCS[state.sel];
+  $('#edgeTitle').textContent = S ? '· ' + S.name : '';
+  $('#edgeBody').innerHTML = S && S.g.edges.length ? S.g.edges.map(e => `<tr><td>${esc(e.from)} → ${esc(e.to)}</td><td class="r">${fmt(e.len)}</td><td class="r">${fmt(e.semt, 4)}</td><td class="r">${fmt(e.dE)}</td><td class="r">${fmt(e.dN)}</td></tr>`).join('')
+    : '<tr><td colspan="5" style="color:var(--muted)">Seçili alan yok.</td></tr>';
+  draw();
+  save();
+}
+$('#resBody').addEventListener('click', e => { const tr = e.target.closest('tr[data-i]'); if (!tr) return; state.sel = +tr.dataset.i; recompute(); });
+function geoCheck(W){
+  const g = $('#geo'); g.textContent = '';
+  if (!PT.size || !window.proj4) return;
+  try {
+    const ps = [...PT.values()], cy = ps.reduce((s, p) => s + p.y, 0) / ps.length, cx = ps.reduce((s, p) => s + p.x, 0) / ps.length;
+    const [lon, lat] = proj4(projDef(), 'WGS84', [cy, cx]);
+    if (!(lat > 35.5 && lat < 42.5 && lon > 25 && lon < 45.5)) { g.textContent = 'Yerel / geçici koordinat: haritada gösterilemez'; return; }
+    const a = document.createElement('a');
+    a.href = 'https://www.google.com/maps?q=' + lat.toFixed(6) + ',' + lon.toFixed(6); a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'Haritada kontrol et (' + lat.toFixed(5) + ', ' + lon.toFixed(5) + ')'; g.appendChild(a);
+  } catch(e) {}
+}
+
+/* ---------- çizim ---------- */
+function nice(v){ const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+function draw(){
+  const svg = $('#plot'), W = 640, H = 460, pad = 50;
+  const all = [...PT.values()];
+  if (all.length < 2) { svg.innerHTML = `<text x="${W/2}" y="${H/2}" class="t-muted" text-anchor="middle">Çizim için nokta girin</text>`; return; }
+  const E = all.map(p => p.y), N = all.map(p => p.x);
+  const minE = Math.min(...E), maxE = Math.max(...E), minN = Math.min(...N), maxN = Math.max(...N);
+  const dE = Math.max(maxE - minE, 0.01), dN = Math.max(maxN - minN, 0.01);
+  const s = Math.min((W - 2*pad) / dE, (H - 2*pad) / dN), ox = (W - dE*s) / 2, oy = (H - dN*s) / 2;
+  const sx = e => ox + (e - minE) * s, sy = n => H - oy - (n - minN) * s;
+  const step = nice(Math.max(dE, dN) / 4), dec = step < 1 ? 2 : 0;
+  const e0 = minE - ox / s, e1 = e0 + W / s, n0 = minN - oy / s, n1 = n0 + H / s;
+  let o = '';
+  for (let e = Math.ceil(e0 / step) * step; e <= e1; e += step) { const X = sx(e).toFixed(1); o += `<line class="g-line" x1="${X}" y1="0" x2="${X}" y2="${H}"/><text class="g-txt" x="${+X + 3}" y="${H - 6}">${e.toFixed(dec)}</text>`; }
+  for (let n = Math.ceil(n0 / step) * step; n <= n1; n += step) { const Y = sy(n).toFixed(1); o += `<line class="g-line" x1="0" y1="${Y}" x2="${W}" y2="${Y}"/><text class="g-txt" x="4" y="${+Y - 3}">${n.toFixed(dec)}</text>`; }
+  const order = PCS.map((p, i) => i).filter(i => i !== state.sel).concat(PCS[state.sel] ? [state.sel] : []);
+  for (const i of order) {
+    const p = PCS[i]; if (p.P.length < 3) continue;
+    o += `<polygon class="poly${i === state.sel ? ' sel' : ''}" data-i="${i}" points="${p.P.map(q => sx(q.y).toFixed(1) + ',' + sy(q.x).toFixed(1)).join(' ')}"/>`;
+  }
+  const S = PCS[state.sel];
+  if (S && S.P.length >= 3 && state.showLen !== false) {
+    const C = [sx(S.g.cx), sy(S.g.cy)], pts = S.P.map(q => [sx(q.y), sy(q.x)]);
+    S.g.edges.forEach((ed, i) => {
+      const a = pts[i], b = pts[(i+1) % pts.length], mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+      let nx = -(b[1]-a[1]), ny = b[0]-a[0]; const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L;
+      if ((mx + nx - C[0])**2 + (my + ny - C[1])**2 > (mx - C[0])**2 + (my - C[1])**2) { nx = -nx; ny = -ny; }
+      let ang = Math.atan2(b[1]-a[1], b[0]-a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+      o += `<text class="e-len" text-anchor="middle" dominant-baseline="middle" transform="translate(${(mx + nx*10).toFixed(1)},${(my + ny*10).toFixed(1)}) rotate(${ang.toFixed(1)})">${fmt(ed.len)}</text>`;
+    });
+    S.g.cross.forEach(([i]) => { const a = pts[i], b = pts[(i+1)%pts.length]; o += `<line class="x-mark" stroke-dasharray="4 3" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`; });
+  }
+  const gc = [sx((minE + maxE) / 2), sy((minN + maxN) / 2)];
+  for (const p of all) {
+    const X = sx(p.y), Y = sy(p.x); let dx = X - gc[0], dy = Y - gc[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    o += `<circle class="pt" cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="3.5"/><text class="pt-no" text-anchor="middle" dominant-baseline="middle" x="${(X + dx*14).toFixed(1)}" y="${(Y + dy*14).toFixed(1)}">${esc(p.no)}</text>`;
+  }
+  for (const p of PCS) {
+    if (p.P.length < 3) continue;
+    const X = sx(p.g.cx), Y = sy(p.g.cy);
+    o += `<text class="c-t1" text-anchor="middle" x="${X.toFixed(1)}" y="${(Y - 3).toFixed(1)}">${esc(p.name)}</text><text class="c-t2" text-anchor="middle" x="${X.toFixed(1)}" y="${(Y + 13).toFixed(1)}">${fmt(p.g.area)} m²</text>`;
+  }
+  o += `<g transform="translate(${W - 30},22)"><path class="na" d="M0,-12 L7,8 L0,3 L-7,8 Z"/><text class="na-t" text-anchor="middle" y="22">K</text></g>`;
+  const sbl = step * s;
+  if (sbl > 20 && sbl < W - 40) o += `<g transform="translate(18,${H - 30})"><path class="sb" d="M0,-5 V0 H${sbl.toFixed(1)} V-5"/><text class="sb-t" x="${(sbl/2).toFixed(1)}" y="-8" text-anchor="middle">${step} m</text></g>`;
+  svg.innerHTML = o;
+}
+$('#plot').addEventListener('click', e => { const p = e.target.closest('polygon[data-i]'); if (p) { state.sel = +p.dataset.i; recompute(); } });
+
+/* ---------- dışa aktarma ---------- */
+const TR = { 'ı':'i','İ':'I','ş':'s','Ş':'S','ğ':'g','Ğ':'G','ü':'u','Ü':'U','ö':'o','Ö':'O','ç':'c','Ç':'C','²':'2' };
+const ascii = s => String(s ?? '').replace(/[ıİşŞğĞüÜöÖçÇ²]/g, c => TR[c]);
+const f3 = v => v.toFixed(3);
+function baseName(){
+  const parc = PCS.map(p => String(p.name).split('/').pop()).filter(Boolean).join('_');
+  const b = state.meta.ada ? state.meta.ada + (parc ? '_' + parc : '') : (parc || 'aplikasyon');
+  return ascii(b).replace(/[^\w\-]+/g, '_');
+}
+function textH(){
+  const all = [...PT.values()]; if (!all.length) return 1;
+  const d = Math.hypot(Math.max(...all.map(p => p.y)) - Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x)) - Math.min(...all.map(p => p.x)));
+  return Math.max(0.25, +(d / 80).toFixed(2));
+}
+function buildDXF(){
+  const L = [], a = (c, v) => { L.push(String(c), String(v)); }, h = textH();
+  a(0,'SECTION'); a(2,'HEADER'); a(9,'$ACADVER'); a(1,'AC1009'); a(0,'ENDSEC');
+  const layers = [['PARSEL',1],['NOKTA',7],['NOKTA_NO',7],['ALAN',5]];
+  a(0,'SECTION'); a(2,'TABLES'); a(0,'TABLE'); a(2,'LAYER'); a(70, layers.length);
+  layers.forEach(([n,c]) => { a(0,'LAYER'); a(2,n); a(70,0); a(62,c); a(6,'CONTINUOUS'); });
+  a(0,'ENDTAB'); a(0,'ENDSEC'); a(0,'SECTION'); a(2,'ENTITIES');
+  for (const p of PCS) {
+    if (p.P.length < 3) continue;
+    a(0,'POLYLINE'); a(8,'PARSEL'); a(66,1); a(10,0); a(20,0); a(30,0); a(70,1);
+    p.P.forEach(q => { a(0,'VERTEX'); a(8,'PARSEL'); a(10,f3(q.y)); a(20,f3(q.x)); a(30,0); });
+    a(0,'SEQEND'); a(8,'PARSEL');
+    const t1 = ascii(p.name), t2 = p.g.area.toFixed(2) + ' m2';
+    a(0,'TEXT'); a(8,'ALAN'); a(10,f3(p.g.cx - t1.length*h*0.35)); a(20,f3(p.g.cy + h*0.4)); a(30,0); a(40,h*1.3); a(1,t1);
+    a(0,'TEXT'); a(8,'ALAN'); a(10,f3(p.g.cx - t2.length*h*0.3)); a(20,f3(p.g.cy - h*1.5)); a(30,0); a(40,h); a(1,t2);
+  }
+  for (const q of PT.values()) {
+    a(0,'POINT'); a(8,'NOKTA'); a(10,f3(q.y)); a(20,f3(q.x)); a(30,0);
+    a(0,'TEXT'); a(8,'NOKTA_NO'); a(10,f3(q.y + h*0.4)); a(20,f3(q.x + h*0.4)); a(30,0); a(40,h*0.8); a(1, ascii(q.no));
+  }
+  a(0,'ENDSEC'); a(0,'EOF');
+  return L.join('\r\n') + '\r\n';
+}
+function buildNCN(){ return [...PT.values()].map(p => `${ascii(p.no)} ${f3(p.y)} ${f3(p.x)} 0.000`).join('\r\n') + '\r\n'; }
+function buildRap(){
+  const m = state.meta, pad = (s, n) => String(s).padStart(n), L = [];
+  L.push('APLİKASYON ALAN KONTROLÜ', '');
+  L.push('İl / İlçe / Mahalle : ' + [m.il, m.ilce, m.mahalle].filter(Boolean).join(' / '));
+  if (m.ada) L.push('Ada                 : ' + m.ada);
+  L.push('Koordinat sistemi   : ' + datumText(), '');
+  L.push('NOKTA            Y (sağa)       X (yukarı)');
+  for (const p of PT.values()) L.push(String(p.no).padEnd(8) + pad(f3(p.y), 16) + pad(f3(p.x), 17));
+  const n2 = v => Number.isFinite(v) ? v.toFixed(2) : '-', s2 = v => Number.isFinite(v) ? (v > 0 ? '+' : '') + v.toFixed(2) : '-';
+  const st = (x, a, b) => x === 'ok' ? a : x === 'bad' ? b : '-';
+  L.push('', 'KÖŞELER');
+  for (const p of PCS) L.push(String(p.name).padEnd(12) + p.ids.join('-'));
+  L.push('', 'ALAN         HESAPLANAN   BELGE HESAP     FARK  KONTROL       TAPU   TAPU FARKI    SINIR / İÇ–DIŞ  TAPU KONTROLÜ');
+  for (const p of PCS) L.push(String(p.name).padEnd(12) + pad(p.P.length >= 3 ? p.g.area.toFixed(2) : '-', 11) + pad(n2(p.doc), 14) + pad(s2(p.diff), 9) + '  ' + st(p.status, 'Uyumlu', 'Fark var').padEnd(10) + pad(n2(p.tapu), 9) + pad(s2(p.tdiff), 13) + pad(p.limTxt.replace(/\u00a0/g,' '), 16) + '  ' + st(p.tstat, 'Sınır içinde', 'Sınırı aşıyor'));
+  L.push('', 'Hesap toleransı: ±' + (state.tol || '0.10') + ' m². Tapu farkı = tapu alanı − hesaplanan alan; yanılma sınırıyla karşılaştırılır. İç/dış alan verilmişse tapu alanının bu aralıkta olması aranır.', 'Alanlar düzlem koordinatlardan Gauss formülüyle hesaplanmıştır.');
+  return L.join('\r\n') + '\r\n';
+}
+async function buildNCZ(){
+  const tpl = await getTemplate();
+  const polys = PCS.filter(p => p.P.length >= 3 && !p.missing.length).map(p => ({ label: p.name, ring: p.P.map(q => [q.y, q.x]) }));
+  const points = [...PT.values()].map(q => ({ name: q.no, y: q.y, x: q.x }));
+  if (!points.length) throw new Error('Aktarılacak nokta yok.');
+  return NCZ.build(tpl, polys, points);
+}
+const EXP = {
+  dxf: { b: buildDXF, ext: '.dxf', save: n => n + '.dxf.txt', label: 'DXF' },
+  ncn: { b: buildNCN, ext: '.ncn', save: n => n + '.ncn.txt', label: 'NCN' },
+  rap: { b: buildRap, save: n => n + '_alan_kontrol.txt', label: 'Rapor' }
+};
+let downloads = null;
+const em = (t, c = '') => { const m = $('#expMsg'); m.textContent = t; m.className = 'msg ' + c; };
+document.querySelectorAll('.exp button[data-x]').forEach(b => b.addEventListener('click', async () => {
+  const k = b.dataset.x, txt = EXP[k].b(), out = $('#out');
+  out.hidden = false; out.value = txt;
+  if (!PT.size) { em('Aktarılacak nokta yok.', 'err'); return; }
+  if (b.dataset.a === 'copy') {
+    try { await navigator.clipboard.writeText(txt); em(EXP[k].label + ' panoya kopyalandı.' + (EXP[k].ext ? ' Not defterine yapıştırıp ' + EXP[k].ext + ' uzantısıyla kaydedin.' : ''), 'good'); }
+    catch(e) { out.focus(); out.select(); em('Kopyalama engellendi; metin seçildi, Ctrl+C ile kopyalayın.'); }
+  } else if (downloads) {
+    const name = STANDALONE ? baseName() + (EXP[k].ext || '_alan_kontrol.txt') : EXP[k].save(baseName());
+    try { await downloads.save({ filename: name, data: txt }); em(name + ' kaydedildi.' + (EXP[k].ext && !STANDALONE ? ' Uzantıyı ' + EXP[k].ext + ' yapın.' : ''), 'good'); }
+    catch(e) { em(e?.code === 'declined' ? 'İndirme iptal edildi.' : 'İndirme bu görünümde yapılamadı; Kopyala\'yı kullanın.'); }
+  }
+}));
+$('#nczBtn').onclick = async () => {
+  if (!PT.size) { em('Aktarılacak nokta yok.', 'err'); return; }
+  em('NCZ hazırlanıyor…', 'busy');
+  try {
+    const ncz = await buildNCZ(), name = baseName();
+    if (!downloads) { em('İndirme bu görünümde kullanılamıyor.', 'err'); return; }
+    if (STANDALONE) {
+      await downloads.save({ filename: name + '.ncz', data: new Blob([ncz]) });
+      em(name + '.ncz indirildi. İndirilenler klasöründen Netcad\'de açın.', 'good'); return;
+    }
+    const zip = ZIP.make([{ name: name + '.ncz', data: ncz }, { name: name + '.dxf', data: new TextEncoder().encode(buildDXF()) }]);
+    await downloads.save({ filename: name + '_ncz.zip', data: new Blob([zip]) });
+    em(name + '_ncz.zip kaydedildi. Zip içindeki ' + name + '.ncz dosyasını Netcad\'de açın.', 'good');
+  } catch(e) {
+    em(e?.code === 'declined' ? 'İndirme iptal edildi.' : 'NCZ oluşturulamadı: ' + (e?.message || e?.code || e), 'err');
+  }
+};
+
+/* ---------- belge okuma ---------- */
+let doc = null, sample = null, imgLimits = null, ctl = null;
+/* ---------- API ile belge okuma ---------- */
+const API_KEY_K = 'aplikasyon-api-key', API_MODEL_K = 'aplikasyon-api-model';
+const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch(e) { return ''; } };
+const lsSet = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); return true; } catch(e) { return false; } };
+const blobB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(b); });
+function apiSample(){
+  const key = lsGet(API_KEY_K); if (!key) return null;
+  const f = async () => ({ text: '' });
+  f.json = async (prompt, { images, signal } = {}) => {
+    const content = [];
+    for (const b of images || []) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: await blobB64(b) } });
+    content.push({ type: 'text', text: prompt });
+    let r;
+    try {
+      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal, headers: {
+        'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: lsGet(API_MODEL_K) || 'claude-opus-5-5', max_tokens: 8000, messages: [{ role: 'user', content }] }) });
+    } catch(e) { throw { code: e?.name === 'AbortError' ? 'cancelled' : 'network', message: String(e?.message || e) }; }
+    if (!r.ok) {
+      let m = ''; try { m = (await r.json())?.error?.message || ''; } catch(e) {}
+      throw { code: r.status === 401 || r.status === 403 ? 'bad_key' : r.status === 429 ? 'rate_limited' : r.status === 529 ? 'upstream_error' : 'api_error', message: r.status + ' ' + m };
+    }
+    const j = await r.json(), t = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
+    const a = t.indexOf('{'), z = t.lastIndexOf('}');
+    if (a < 0 || z < a) throw { code: 'invalid_json', message: t.slice(0, 200) };
+    try { return JSON.parse(t.slice(a, z + 1)); } catch(e) { throw { code: 'invalid_json', message: t.slice(0, 200) }; }
+  };
+  return f;
+}
+function setupApi(){
+  $('#apiBox').hidden = false;
+  const s = apiSample();
+  sample = s; imgLimits = s ? { maxCount: 4 } : null;
+  $('#apiSum').textContent = s ? 'Otomatik okuma açık · ayarlar' : 'Otomatik okumayı aç (yapay zekâ API anahtarı)';
+  $('#apiModel').value = lsGet(API_MODEL_K) || 'claude-opus-5-5';
+  $('#aiBtn').hidden = !s;
+  $('#readBtn').classList.toggle('primary', !s);
+  updButtons();
+}
+$('#apiSave').onclick = () => {
+  const k = $('#apiKey').value.trim();
+  if (!/^sk-ant-/.test(k)) { $('#apiMsg').textContent = 'Anahtar "sk-ant-" ile başlamalı.'; $('#apiMsg').className = 'msg err'; return; }
+  if (!lsSet(API_KEY_K, k)) { $('#apiMsg').textContent = 'Tarayıcı bu dosyada kayda izin vermiyor; dosyayı Chrome veya Edge ile açın.'; $('#apiMsg').className = 'msg err'; return; }
+  lsSet(API_MODEL_K, $('#apiModel').value); $('#apiKey').value = '';
+  $('#apiMsg').textContent = 'Kaydedildi. Belge yükleyip "Belgeyi oku"ya basın.'; $('#apiMsg').className = 'msg good'; setupApi();
+};
+$('#apiModel').addEventListener('change', () => lsSet(API_MODEL_K, $('#apiModel').value));
+$('#apiDel').onclick = () => { lsSet(API_KEY_K, ''); $('#apiMsg').textContent = 'Anahtar bu bilgisayardan silindi.'; $('#apiMsg').className = 'msg'; setupApi(); };
+const dm = (t, c='') => { const m = $('#docMsg'); m.textContent = t; m.className = 'msg ' + c; };
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const drop = $('#drop');
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = e.dataTransfer?.files?.[0]; if (f) openFile(f); });
+$('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) openFile(f); e.target.value = ''; });
+$('#prevWrap').addEventListener('click', e => {
+  const w = $('#prevWrap'), r = w.getBoundingClientRect(), fx = (e.clientX - r.left + w.scrollLeft) / w.scrollWidth, fy = (e.clientY - r.top + w.scrollTop) / w.scrollHeight;
+  w.classList.toggle('zoom');
+  if (w.classList.contains('zoom')) { w.scrollLeft = fx * w.scrollWidth - w.clientWidth / 2; w.scrollTop = fy * w.scrollHeight - w.clientHeight / 2; }
+});
+$('#pageSel').addEventListener('change', () => renderPage(+$('#pageSel').value));
+function updButtons(){ $('#aiBtn').disabled = !doc || !sample; $('#readBtn').disabled = !(doc && doc.lines && doc.lines.length > 3); }
+
+async function openFile(f){
+  doc = null; updButtons(); $('#pageSel').hidden = true;
+  dm(f.name + ' açılıyor…', 'busy');
+  try {
+    if (/pdf$/i.test(f.type) || /\.pdf$/i.test(f.name)) {
+      if (!window.pdfjsLib) throw new Error('PDF okuyucu yüklenemedi; sayfayı yenileyin');
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await f.arrayBuffer()), isEvalSupported: false }).promise;
+      doc = { kind:'pdf', name:f.name, pdf, pages: pdf.numPages };
+      if (pdf.numPages > 1) { $('#pageSel').innerHTML = Array.from({ length: pdf.numPages }, (_, i) => `<option value="${i+1}">Sayfa ${i+1}</option>`).join(''); $('#pageSel').hidden = false; }
+      await renderPage(1);
+    } else {
+      const bmp = await createImageBitmap(f, { imageOrientation: 'from-image' });
+      const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height; c.getContext('2d').drawImage(bmp, 0, 0);
+      doc = { kind:'img', name:f.name, canvas:c, lines:[] }; showPreview(c);
+      dm(f.name + (sample ? ' yüklendi. "Belgeyi oku"ya basın.' : ' yüklendi. Otomatik okuma kapalı: API anahtarı girin ya da koordinatları önizlemeye bakarak tabloya girin.'), 'good');
+    }
+    updButtons();
+
+  } catch(e) { doc = null; updButtons(); dm('Dosya açılamadı: ' + (e.message || e), 'err'); }
+}
+async function renderPage(n){
+  const page = await doc.pdf.getPage(n), vp0 = page.getViewport({ scale: 1 });
+  const vp = page.getViewport({ scale: Math.min(4, 2400 / vp0.width) });
+  const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: g, viewport: vp }).promise;
+  const tc = await page.getTextContent(), rows = [];
+  for (const it of tc.items) {
+    if (!it.str || !it.str.trim()) continue;
+    const x = it.transform[4], y = it.transform[5];
+    let r = rows.find(r => Math.abs(r.y - y) < 2.5); if (!r) { r = { y, items: [] }; rows.push(r); }
+    r.items.push({ x, s: it.str });
+  }
+  rows.sort((a, b) => b.y - a.y);
+  doc.canvas = c; doc.page = n;
+  doc.lines = rows.map(r => r.items.sort((a, b) => a.x - b.x).map(i => i.s).join('  '));
+  showPreview(c); updButtons();
+  const hasT = doc.lines.length > 3;
+  dm(doc.name + ' · ' + doc.pages + ' sayfa · ' + (hasT ? 'metinli PDF' : 'taranmış PDF') + (sample ? '. "Belgeyi oku"ya basın.' : (hasT ? '. "PDF\'ten koordinatları al"a basın; sonuçları belgeyle karşılaştırın.' : '. Otomatik okuma kapalı: API anahtarı girin ya da koordinatları önizlemeye bakarak tabloya girin.')), 'good');
+}
+function showPreview(c){
+  const p = $('#prev'), w = Math.min(2400, c.width), s = w / c.width;
+  p.width = w; p.height = Math.round(c.height * s); p.getContext('2d').drawImage(c, 0, 0, p.width, p.height);
+  $('#prevWrap').hidden = false;
+}
+$('#readBtn').onclick = () => {
+  if (!doc?.lines?.length) return;
+  let list = rangeParse(doc.lines);
+  if (list.length < 3) list = localParse(doc.lines);
+  if (list.length < 3) { dm('Metinde koordinat tablosu bulunamadı. ' + (STANDALONE ? 'Koordinatları önizlemeye bakarak girin.' : '"Belgeyi oku" ile deneyin.'), 'err'); return; }
+  notices = []; setPoints(list); state.parcels = [allPointsParcel()]; state.sel = 0;
+  touched(); renderPts(); renderPcs(); recompute();
+  dm(list.length + ' nokta alındı ve tek alan oluşturuldu. ' + (STANDALONE ? 'Taranmış belgelerde metin hatalı ya da eksik olabilir: her noktayı belgeyle karşılaştırın, eksikleri ekleyin ve parselleri Alanlar tablosuna girin.' : 'Alan listesi için "Belgeyi oku"yu kullanın.'), 'good');
+};
+$('#aiBtn').onclick = () => aiRead();
+$('#stopBtn').onclick = () => ctl?.abort();
+
+async function makeTiles(src, max){
+  let W = Math.min(src.width, 1800); const ov = 60;
+  for (;;) {
+    const s = W / src.width, H = Math.round(src.height * s), th = Math.floor(1150000 / W);
+    const n = H <= th ? 1 : Math.ceil((H - ov) / (th - ov));
+    if (n <= max || W < 700) {
+      const tiles = [];
+      for (let k = 0; k < Math.min(n, max); k++) {
+        const y0 = k * (th - ov), h = Math.min(th, H - y0), c = document.createElement('canvas');
+        c.width = W; c.height = h; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, h);
+        g.drawImage(src, 0, y0 / s, src.width, h / s, 0, 0, W, h);
+        tiles.push(await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92)));
+      }
+      return tiles;
+    }
+    W = Math.floor(W * 0.85);
+  }
+}
+const RULES = `Sen Türk tapu-kadastro aplikasyon belgelerini (aplikasyon krokisi, EK 14-B vb.) okuyan bir harita teknikeri asistanısın. Belgeden şunları çıkar:
+1) KOORDİNAT TABLOSU ("Parsel Köşe Koordinatları" vb.): her köşe noktasının adı (K1, 101 …), Y ve X değeri.
+   - Y sağa (doğu), X yukarı (kuzey) değeridir. Koordinatlar UTM (Y ~6 hane, X ~7 hane) ya da yerel/geçici (ör. Y 1000.52, X 2015.76) olabilir; belgede yazdığı gibi al.
+   - Tabloda metre ve cm ayrı sütunlarda olabilir (ör. "1000" ve "52" → 1000.52).
+   - Belgede iki koordinat tablosu varsa (ör. "İMAR"/yerel ve "ITRF-96"), yerel/İMAR tablosunu "noktalar"a, ITRF tablosunu "itrf_noktalar"a yaz (aynı biçimde). Tek tablo varsa "itrf_noktalar" null.
+   - Kullanılan yer kontrol noktaları / poligon noktaları (P.12345 gibi) parsel köşesi DEĞİLDİR; onları alma.
+   - Değeri tüm ondalıklarıyla al, ondalık ayırıcıyı noktaya çevir. Net okuyamadığın rakamı tahmin etme; o noktada "belirsiz": true yaz.
+2) PARSELLER: belgedeki her parsel için:
+   - "ad": "ada/parsel" biçiminde (ör. ada 100, parsel 1 → "100/1"). Ada yoksa yalnız parsel no.
+   - "noktalar": krokide o parseli çevreleyen köşe noktaları, sınır boyunca sırayla (ilk nokta sonda tekrar edilmez). Krokideki parsel numarasının yazdığı alanın sınırındaki tüm köşe noktalarını, aradaki ara noktalar dahil, sırayla ver. Komşu parseller ortak kenar ve noktaları paylaşır.
+   - Alan tablosu ("Tapu Alanı | Hesap Alanı | Fark | Yanılma Sınırı") satırları, "Parsel No" alanındaki sıra ile (ör. "1-2-3") eşleşir: 1. satır 1. parsel, 2. satır 2. parsel…
+   - "hesap_alani", "tapu_alani", "yanilma_siniri": m² sayı olarak; yoksa null. Bazı belgelerde yanılma sınırı yerine "Dış Alan" ve "İç Alan" verilir: bunları "dis_alan" ve "ic_alan" olarak ver.
+   - Alan değerlerinde "m²" yazısını at; 182 m² → 182.
+   - Köşe sırasını krokiden çıkardıysan "sira_tahmini": true yaz.
+3) KONUM: il, ilçe, mahalle/köy, ada; datum (ITRF96/TUREF ya da ED50), DOM (27, 30, 33 …), dilim (3 veya 6). Yoksa null.
+Yanıtın yalnızca şu biçimde tek bir JSON nesnesi olsun:
+{"il":null,"ilce":null,"mahalle":null,"ada":null,"datum":null,"dom":null,"dilim":null,
+ "noktalar":[{"no":"K1","y":1000.00,"x":2015.00,"belirsiz":false}], "itrf_noktalar":null,
+ "parseller":[{"ad":"100/1","noktalar":["K1","K2","K7","K8"],"hesap_alani":150.00,"tapu_alani":150.50,"yanilma_siniri":2.80,"ic_alan":null,"dis_alan":null,"sira_tahmini":true}]}`;
+const ERR = {
+  rate_limited:'Kullanım sınırına ulaşıldı ya da çok sık istek gönderildi. Biraz sonra yeniden deneyin.',
+  image_rejected:'Görsel kabul edilmedi; daha net bir fotoğraf deneyin.', images_unavailable:'Bu görünümde görsel gönderilemiyor.',
+  invalid_json:'Yanıt çözümlenemedi. Yeniden deneyin.', refused:'Belge okunamadı.', empty_completion:'Boş yanıt geldi. Yeniden deneyin.',
+  session_expired:'Oturum süresi doldu; yeniden giriş yapın.', bad_key:'API anahtarı geçersiz ya da yetkisiz. "Otomatik okuma" ayarından kontrol edin.',
+  network:'api.anthropic.com adresine ulaşılamadı. İnternet bağlantısını ya da kurum güvenlik duvarını kontrol edin.', api_error:'API isteği reddedildi.', upstream_error:'Bağlantı sorunu. Yeniden deneyin.', prompt_too_large:'Belge çok büyük; tek sayfa seçip deneyin.'
+};
+async function aiRead(){
+  if (!sample || !doc) return;
+  const hasText = doc.lines && doc.lines.length > 3 && doc.lines.join('').length > 40;
+  let prompt = RULES, images;
+  $('#aiBtn').disabled = $('#readBtn').disabled = true;
+  dm('Belge hazırlanıyor…', 'busy');
+  if (imgLimits && doc.canvas) {
+    images = await makeTiles(doc.canvas, imgLimits.maxCount || 4);
+    prompt += `\n\nEkteki ${images.length} görsel aynı belge sayfasının yukarıdan aşağıya sıralı, biraz örtüşen dilimleridir (1. görsel en üstte). Örtüşen satırları bir kez yaz.`;
+  }
+  if (hasText) prompt += '\n\nBelgenin metin katmanı (satır satır). Taranmış belgelerde bu OCR metnidir ve hatalı olabilir; rakamları görselle karşılaştır, çelişkide görsele güven:\n' + doc.lines.join('\n').slice(0, 60000);
+  if (!images && !hasText) { dm('Bu görünümde görsel okuma kullanılamıyor ve belgede metin yok. Koordinatları elle girin.', 'err'); updButtons(); return; }
+  ctl = new AbortController();
+  $('#aiBtn').disabled = $('#readBtn').disabled = true; $('#stopBtn').hidden = false;
+  dm('Belge okunuyor… (30–90 sn sürebilir)', 'busy');
+  try {
+    const r = await sample.json(prompt, { images, modelTier: 'complex', signal: ctl.signal });
+    const raw = Array.isArray(r?.noktalar) ? r.noktalar : [];
+    const list = raw.map(p => ({ no: String(p.no ?? '').trim(), y: parseNum(p.y), x: parseNum(p.x), doubt: !!p.belirsiz })).filter(p => Number.isFinite(p.y) && Number.isFinite(p.x));
+    const it = (Array.isArray(r?.itrf_noktalar) ? r.itrf_noktalar : []).map(p => ({ no: String(p.no ?? '').trim(), y: parseNum(p.y), x: parseNum(p.x) })).filter(p => Number.isFinite(p.y) && Number.isFinite(p.x));
+    state.sets = it.length >= 3 ? { 'Yerel / İMAR': list.map(p => ({ no: p.no, y: String(p.y), x: String(p.x) })), 'ITRF-96': it.map(p => ({ no: p.no, y: String(p.y), x: String(p.x) })) } : null;
+    state.setName = state.sets ? 'Yerel / İMAR' : null;
+    if (list.length < 3) { dm('Belgede yeterli koordinat bulunamadı (' + list.length + '). Koordinatları elle girin.', 'err'); return; }
+    notices = []; setPoints(list);
+    const al = Array.isArray(r?.parseller) ? r.parseller : Array.isArray(r?.alanlar) ? r.alanlar : [];
+    const num = v => Number.isFinite(parseNum(v)) ? parseNum(v).toFixed(2) : '';
+    state.parcels = al.map((a, i) => ({ name: String(a.ad ?? ('Alan ' + (i+1))), seq: (Array.isArray(a.noktalar) ? a.noktalar : splitSeq(a.noktalar)).map(String).join('-'), doc: num(a.hesap_alani ?? a.alan), tapu: num(a.tapu_alani), lim: num(a.yanilma_siniri), ic: num(a.ic_alan), dis: num(a.dis_alan) })).filter(a => a.seq);
+    const guessed = al.filter(a => a.sira_tahmini).map(a => a.ad);
+    if (guessed.length) notices.push({ c:'', t:'Köşe sırası belgede açık değildi, çizimden çıkarıldı: ' + guessed.join(', ') + '. Kontrol edin.' });
+    if (!state.parcels.length) { state.parcels = [allPointsParcel()]; notices.push({ c:'', t:'Belgede alan listesi bulunamadı; tüm noktalardan tek alan oluşturuldu.' }); }
+    const setM = (k, v) => { if (v !== null && v !== undefined && String(v).trim() !== '') { state.meta[k] = String(v); $('#m-' + k).value = state.meta[k]; } };
+    setM('il', r.il); setM('ilce', r.ilce); setM('mahalle', r.mahalle); setM('ada', r.ada);
+    if (r.datum || r.dilim) { const ed = /ed/i.test(String(r.datum || '')); state.meta.datum = ed ? (+r.dilim === 6 ? 'ED50_6' : 'ED50_3') : 'ITRF96_3'; $('#m-datum').value = state.meta.datum; }
+    if (+r.dom) state.meta.dom = String(+r.dom);
+    fillDom(); state.sel = 0; touched(); renderSets(); renderPts(); renderPcs(); recompute();
+    const dq = list.filter(p => p.doubt).length;
+    dm(list.length + ' nokta ve ' + state.parcels.length + ' alan okundu' + (dq ? ', ' + dq + ' nokta belirsiz (kırmızı)' : '') + '. Sonuçları "Alan kontrolü"nde görün; noktaları belgeyle karşılaştırıp işaretleyin.', 'good');
+  } catch(e) {
+    if (e?.code === 'cancelled') dm('Okuma durduruldu.');
+    else { dm((ERR[e?.code] || 'Okuma başarısız.') + (/api_error|upstream_error|invalid_json/.test(e?.code) && e?.message ? ' (' + e.message + ')' : ''), 'err'); if (e?.code === 'not_granted' || e?.code === 'sampling_disabled') sample = null; }
+  } finally { $('#stopBtn').hidden = true; updButtons(); }
+}
+
+/* ---------- başlat ---------- */
+$('#exBadge').hidden = !state.example;
+fillDatum(); renderSets(); renderPts(); renderPcs(); recompute();
+document.querySelectorAll('.dl').forEach(b => b.hidden = true);
+if (STANDALONE) {
+  downloads = { save: async ({ filename, data }) => {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    return { status: 'saved' };
+  } };
+  document.querySelectorAll('.dl').forEach(b => b.hidden = false);
+  $('#readBtn').textContent = "PDF'ten koordinatları al"; setupApi();
+  $('#nczDesc').textContent = 'PARSEL katmanında adlı parsel alanları, NOKTA katmanında adlı köşe noktaları. Doğrudan .ncz iner.';
+  $('#nczNote').textContent = 'NCZ, Netcad 8.5.6’nın kendi ürettiği örnek proje dosyasının yapısıyla yazılır: katmanlar 0, PARSEL, NOKTA. Dosya doğrudan .ncz olarak iner.';
+  $('#docMsg').textContent = sample ? 'Belge yükleyin ve "Belgeyi oku"ya basın.' : 'Belge yükleyin. Taranmış belgeleri otomatik okumak için aşağıdan API anahtarını bir kez girin; anahtar yoksa koordinatları önizlemeye bakarak tabloya girin.';
+}
+})();
+</script>
+
+</body></html>

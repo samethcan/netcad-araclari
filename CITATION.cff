@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "Bu yazılımı kullanırsanız lütfen aşağıdaki şekilde atıf yapın."
+title: "netcad-araclari: Netcad kullanan haritacılar için açık kaynak araçlar"
+type: software
+authors:
+  - family-names: "Can"
+    given-names: "Samet Hüseyin"
+version: "1.0.0"
+date-released: "2026-11-19"
+license: MIT
+repository-code: "https://github.com/samethcan/netcad-araclari"
+url: "https://samethcan.github.io/netcad-araclari/"
+keywords:
+  - netcad
+  - ncz
+  - cbs
+  - gis
+  - kadastro
+  - aplikasyon
+  - pafta

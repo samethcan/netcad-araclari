@@ -1,0 +1,12 @@
+{
+  "title": "netcad-araclari: Netcad kullanan haritacılar için açık kaynak araçlar",
+  "upload_type": "software",
+  "description": "Netcad kullanan harita büroları, kurumlar ve tüm haritacılar için açık kaynak araçlar: Netcad NCZ (8.x) dosya okuyucu ve biçim notları, aplikasyon belgesinden alan hesabı ve NCZ çıktısı üreten tarayıcı aracı, 3B pafta indeksi, kadastro pafta alanı üretimi ve ITRF 1/1000 pafta adı hesabı. Depoda kurum verisi yoktur; örnek veriler uydurmadır.",
+  "creators": [{ "name": "Can, Samet Hüseyin" }],
+  "license": "MIT",
+  "language": "tur",
+  "keywords": ["netcad", "ncz", "cbs", "gis", "kadastro", "aplikasyon", "pafta", "harita"],
+  "related_identifiers": [
+    { "identifier": "https://samethcan.github.io/netcad-araclari/", "relation": "isDocumentedBy", "resource_type": "other" }
+  ]
+}

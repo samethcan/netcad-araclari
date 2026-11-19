@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netcad NCZ dosya biçimi: yapı, bloklar ve geometri kayıtları</title>
+<meta name="description" content="Netcad 8.x NCZ dosyasının iç yapısı: blok düzeni, başlık, katman tablosu, nokta, poligon, yazı ve pafta çerçevesi kayıtları. NCZ dosyasını Python ile okuma ve GeoJSON'a çevirme.">
+<meta name="author" content="Samet Hüseyin Can">
+<link rel="canonical" href="https://samethcan.github.io/netcad-araclari/ncz-bicimi/">
+<meta property="og:title" content="Netcad NCZ dosya biçimi">
+<meta property="og:description" content="NCZ dosyasının iç yapısı ve Python ile okunması.">
+<meta property="og:url" content="https://samethcan.github.io/netcad-araclari/ncz-bicimi/">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Netcad NCZ dosya biçimi: yapı, bloklar ve geometri kayıtları","inLanguage":"tr","datePublished":"2026-11-19","author":{"@type":"Person","name":"Samet Hüseyin Can","url":"https://samethcan.github.io/"},"url":"https://samethcan.github.io/netcad-araclari/ncz-bicimi/","keywords":"Netcad, NCZ, NCZ formatı, NCZ dosyası, CBS, GeoJSON, Python"}
+</script>
+<style>
+:root{color-scheme:light dark;--fg:#1d1d1f;--mut:#5f6368;--bg:#fff;--card:#f5f5f7;--acc:#0a66c2;--bd:#e3e3e8;--code:#f0f0f3}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--mut:#a0a0a5;--bg:#121214;--card:#1e1e22;--acc:#58a6ff;--bd:#2c2c31;--code:#1b1b1f}}
+*{box-sizing:border-box}body{margin:0;font:17px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--fg);background:var(--bg)}
+main{max-width:780px;margin:0 auto;padding:48px 22px 64px}
+nav{font-size:.9rem;margin-bottom:28px}nav a{color:var(--acc);text-decoration:none}
+h1{font-size:2rem;line-height:1.25;margin:0 0 10px;letter-spacing:-.02em}
+.meta{color:var(--mut);font-size:.92rem;margin:0 0 28px}
+h2{font-size:1.35rem;margin:40px 0 10px}h3{font-size:1.08rem;margin:26px 0 6px}
+p,li{color:var(--fg)}a{color:var(--acc)}
+code{font:.88em ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);padding:14px 16px;border-radius:8px;overflow:auto;font:.86rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:10px 0 6px}
+th,td{border-bottom:1px solid var(--bd);padding:7px 8px;text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:600}
+.note{background:var(--card);border-radius:10px;padding:14px 18px;color:var(--mut);font-size:.95rem}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--bd);color:var(--mut);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="../">← Netcad Araçları</a></nav>
+<article>
+<h1>Netcad NCZ dosya biçimi: yapı, bloklar ve geometri kayıtları</h1>
+<p class="meta">Samet Hüseyin Can · 19 Kasım 2026</p>
+
+<p class="note">Bu yazı resmî bir belge değildir. Netcad 8.5.x ile üretilmiş dosyalar incelenerek ve yazılan dosyalar Netcad'de açılarak çıkarılmıştır. Farklı sürümlerde ayrıntılar değişebilir; ürettiğiniz dosyaları mutlaka Netcad'de kontrol edin. Netcad, Netcad Yazılım A.Ş.'nin markasıdır; bu çalışmanın Netcad ile resmî bir ilişkisi yoktur.</p>
+
+<h2>NCZ nedir?</h2>
+<p>NCZ, Netcad'in çizim ve proje dosyası uzantısıdır. Harita büroları, belediyeler ve kadastro birimleri aplikasyon, halihazır, imar ve parselasyon çalışmalarını bu dosyalarda tutar. Biçim kapalıdır, yani yayımlanmış bir belgesi yoktur. Bu yüzden NCZ dosyası Netcad dışında, örneğin Python betiklerinde, QGIS'te ya da bir web uygulamasında doğrudan okunamaz; önce Netcad'den DXF veya başka bir biçime aktarmak gerekir.</p>
+<p>Aşağıdaki notlar bu ara adımı ortadan kaldırmak için yazıldı. Netcad 8.x'in ürettiği bir NCZ dosyasının içinde neyin nerede durduğunu anlatır.</p>
+
+<h2>Genel yapı: bloklar</h2>
+<p>Dosya, art arda dizilmiş <b>bloklardan</b> oluşur. Sıkıştırma yoktur. Her blok aynı küçük başlıkla başlar:</p>
+<pre><code>[kind : 1 bayt] [len : 4 bayt, little-endian] [gövde ...]
+blok boyu = len + 5</code></pre>
+<p><code>kind</code> bloğun türünü söyler, <code>len</code> gövdenin uzunluğudur. Bir bloğun sonu bir sonrakinin başıdır ve zincir dosyanın sonunda tam olarak biter. Dosyayı okumak, baştan başlayıp bu zinciri yürümekten ibarettir.</p>
+
+<table>
+<tr><th>kind</th><th>İçerik</th></tr>
+<tr><td><code>1</code></td><td>Başlık. Dosya her zaman bununla başlar.</td></tr>
+<tr><td><code>4</code></td><td>Görünüm alanı (ekranda açılacak pencere)</td></tr>
+<tr><td><code>6</code></td><td>Katman tablosu</td></tr>
+<tr><td><code>14</code></td><td>Küçük resim (BMP)</td></tr>
+<tr><td><code>21</code></td><td>CAD nesnesi (nokta, çizgi, poligon, yazı...)</td></tr>
+<tr><td><code>22</code></td><td>GIS nesnesi (CAD nesnesi + sınıf adı ve nesne anahtarı)</td></tr>
+<tr><td><code>25</code>, <code>28</code></td><td>Adlı veri blokları (proje XML'leri vb.)</td></tr>
+<tr><td><code>33</code></td><td>Bir sonraki nesnenin uzun adı ya da yazının devamı</td></tr>
+</table>
+<p>Konumlar bu yazıda bloğun ilk baytına göre verilir: <code>+8</code>, bloğun başından 8 bayt sonrası demektir. Sayılar little-endian'dır; <code>f64</code> 8 baytlık, <code>f32</code> 4 baytlık kayan noktalı sayıdır.</p>
+
+<h2>Başlık (kind 1)</h2>
+<ul>
+<li><code>u32 @+5</code>: dosyanın toplam boyu</li>
+<li>Ardından diğer başlık bloklarının dosya içindeki konumları (ofsetler)</li>
+<li><code>4 × f64 @+49</code>: projenin sınır kutusu</li>
+<li><code>u32 @+81</code>: geometri sayısı</li>
+</ul>
+<p>Okurken başlığa güvenmek gerekmez, blok zinciri zaten her şeyi verir. Yazarken ise dosya boyu, sınır kutusu, geometri sayısı ve ofsetler yeni içeriğe göre yeniden hesaplanmalıdır; aksi halde Netcad dosyayı açmaz ya da yanlış yere yakınlaşır.</p>
+
+<h2>Katman tablosu (kind 6)</h2>
+<ul>
+<li><code>u16 @+16</code>: katman sayısı</li>
+<li><code>+18</code>'den itibaren her katman için 29 baytlık bir kayıt</li>
+<li>Kaydın 5. baytı (<code>r[4]</code>) ad uzunluğu, ardından ad (<code>r[5:]</code>)</li>
+</ul>
+<p>Geometri kayıtlarındaki katman kodu bu listede doğrudan sıra numarasıdır: kodu 2 olan nesne, tablodaki üçüncü katmandadır.</p>
+
+<h2>Geometri kayıtları (kind 21 ve 22)</h2>
+<p>Her nesne bir bloktur. Tüm nesne tiplerinde ortak alanlar:</p>
+<table>
+<tr><th>Konum</th><th>Alan</th></tr>
+<tr><td><code>+6</code></td><td>Nesne tipi (aşağıdaki tablo)</td></tr>
+<tr><td><code>+7</code></td><td>Katman kodu</td></tr>
+<tr><td><code>f64 @+8</code></td><td>X (kuzey)</td></tr>
+<tr><td><code>f64 @+16</code></td><td>Y (doğu)</td></tr>
+<tr><td><code>4 × f64 @+50</code></td><td>Sınır kutusu (minX, minY, maxX, maxY)</td></tr>
+</table>
+<p><b>Koordinat sırasına dikkat:</b> Netcad'de X kuzey, Y doğudur (jeodezik düzen). Çoğu CBS yazılımı ise önce doğuyu (x), sonra kuzeyi (y) bekler. Dışarı aktarırken sırayı çevirmek gerekir.</p>
+<p><b>GIS nesnesi kayması:</b> kind 22 kayıtlarında <code>+86</code>'dan sonra 28 baytlık ek alan (sınıf adı ve nesne anahtarı) bulunur. Bu yüzden etiket ve köşe alanları 28 bayt ileri kayar. Ortak alanlar (+6, +7, +8, +16) kaymaz.</p>
+
+<h3>Nesne tipleri</h3>
+<table>
+<tr><th>Tip</th><th>Nesne</th><th>Önemli alanlar</th></tr>
+<tr><td><code>1</code></td><td>Nokta</td><td>Konum <code>+8/+16</code>; ad uzunluğu <code>+86</code>, ad <code>+87</code></td></tr>
+<tr><td><code>2</code></td><td>Çizgi</td><td>Başlangıç <code>+8/+16</code>; bitiş X <code>@+86</code>, Y <code>@+94</code></td></tr>
+<tr><td><code>5</code></td><td>Yazı</td><td>Yükseklik <code>f32 @+86</code>, dönüklük <code>f32 @+90</code> (radyan), metin uzunluğu <code>+97</code>, metin <code>+98</code></td></tr>
+<tr><td><code>7</code></td><td>Çoklu çizgi / poligon</td><td>Köşeler <code>+113</code>'ten itibaren, her biri 24 bayt (X, Y, Z <code>f64</code>); etiket uzunluğu <code>+86</code>, etiket <code>+87</code>; bayraklar <code>i32 @+101</code></td></tr>
+<tr><td><code>10</code></td><td>Döndürülmüş dikdörtgen (pafta çerçevesi)</td><td>P1 <code>+8/+16</code>, P3 <code>+104/+112</code>, dönüklük <code>f32 @+120</code></td></tr>
+<tr><td><code>15</code></td><td>Akıllı nesne</td><td><code>len</code> alanı 81 bayt eksik yazılır</td></tr>
+</table>
+
+<h3>Poligon (tip 7)</h3>
+<p>Köşe sayısı blok boyundan hesaplanır:</p>
+<pre><code>köşe sayısı = (blok_boyu − 113 − kayma) / 24      # kayma: kind 21 için 0, kind 22 için 28</code></pre>
+<p>Her köşe X, Y, Z olmak üzere üç <code>f64</code> değerdir. Kapalı alanlarda ilk ve son köşe genellikle aynıdır. Netcad'in ürettiği dosyalarda <code>+101</code>'deki bayrak alanında 1 kapalı, 2 dolgulu, 16 adlı anlamına gelir.</p>
+<p>Etiket (parsel numarası gibi) kayıt içinde en çok 10 karakter tutar. Ad daha uzunsa tam hali, nesneden hemen önceki <b>kind 33</b> bloğunda durur. Nokta adları için de aynı kural geçerlidir.</p>
+
+<h3>Yazı (tip 5)</h3>
+<p>Metin kayıt içinde en çok 50 karakterdir. Daha uzun metinlerde devamı kind 33 bloğundadır. Yükseklik ve dönüklük 4 baytlık <code>f32</code> değerlerdir, dönüklük radyan cinsindendir.</p>
+
+<h3>Pafta çerçevesi (tip 10)</h3>
+<p>Döndürülmüş bir dikdörtgendir. Genişlik ve yükseklik iki köşeden bulunur, diğer köşeler P1 etrafında θ kadar döndürülerek elde edilir:</p>
+<pre><code>W = P3.Y − P1.Y
+H = P3.X − P1.X
+θ = f32 @+120</code></pre>
+
+<h3>Akıllı nesne (tip 15)</h3>
+<p>Bu kayıtlarda <code>len</code> alanı gövdeden sonra gelen 81 baytlık bölümü saymaz. Blok zincirinde bir sonraki başlık geçersiz görünüyorsa 81 bayt ileri bakmak zinciri düzeltir.</p>
+
+<h2>Karakter kodlaması</h2>
+<p>Katman adları, nokta adları, etiketler ve yazılar <b>Windows-1254</b> (cp1254, Türkçe) kod sayfasıyla yazılır. UTF-8 olarak okunursa ç, ğ, ı, ö, ş, ü harfleri bozuk çıkar.</p>
+
+<h2>Python ile okuma</h2>
+<p>Bu notlara göre yazılmış okuyucu, bağımlılığı olmayan küçük bir Python paketidir:</p>
+<pre><code>pip install netcad-ncz</code></pre>
+<p>Komut satırından dosyanın özetini görmek ve GeoJSON'a çevirmek için:</p>
+<pre><code>ncz-oku proje.ncz
+ncz-oku proje.ncz --geojson proje.geojson</code></pre>
+<p>Python içinden:</p>
+<pre><code>import netcad_ncz
+
+r = netcad_ncz.read("proje.ncz")
+print(r["layers"])                     # katman adları
+for f in r["feats"]:
+    if f["type"] == 7:                 # poligonlar
+        print(f["layer"], f.get("label"), len(f["pts"]), "köşe")
+
+geojson = netcad_ncz.to_geojson(r)     # QGIS'te açılabilir</code></pre>
+<p>Okuyucu koordinatları (Y doğu, X kuzey) sırasıyla, yani CBS yazılımlarının beklediği düzende verir. Projeksiyon dönüşümü yapmaz; QGIS'te katmanı açarken dosyanın koordinat sistemini (ör. TUREF / TM27, EPSG:5253) seçmeniz yeterlidir.</p>
+
+<h2>NCZ yazma</h2>
+<p>Sıfırdan geçerli bir NCZ yazmak yerine, Netcad'in ürettiği boş bir şablon dosyası kullanılır: başlık blokları kopyalanır; katman tablosu, görünüm alanı, sınır kutusu, dosya boyu ve geometri sayısı yeniden yazılır, ardından geometri kayıtları eklenir. Bu yöntemle üretilen dosyalar Netcad 8.5.6'da sorunsuz açılmaktadır. Uygulaması <a href="../aplikasyon/aplikasyon_alan_hesabi.html">Aplikasyon Alan Hesabı</a> aracının içinde, kaynak kodda <code>NCZ.build</code> işlevindedir.</p>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+<li>Notlar Netcad 8.5.x dosyalarına dayanır. Eski (5.x, 7.x) ya da yeni sürümlerde farklılık olabilir.</li>
+<li><code>netcad-ncz</code> okuyucusu şu an nokta (1), poligon (7) ve yazıyı (5) tam okur. Çizgi (2), pafta çerçevesi (10) ve diğer tiplerden yalnızca ilk konum alınır; bu tiplerin alanları yukarıda belgelenmiştir.</li>
+<li>Stil (renk, çizgi tipi, kalınlık) ve öznitelik tabloları bu notların kapsamında değildir.</li>
+</ul>
+<p>Hata ya da farklı davranan bir dosya bulursanız GitHub'da <a href="https://github.com/samethcan/netcad-araclari/issues">bir kayıt açabilirsiniz</a>. Kurum verisi içeren dosya paylaşmayın; sorunu gösteren uydurma bir örnek yeterlidir.</p>
+</article>
+
+<footer>
+<a href="https://github.com/samethcan/netcad-araclari">Kaynak kod</a> ·
+<a href="https://pypi.org/project/netcad-ncz/">netcad-ncz (PyPI)</a> ·
+<a href="../">Netcad Araçları</a> ·
+<a href="https://samethcan.github.io/">Samet Hüseyin Can</a>
+</footer>
+</main>
+</body>
+</html>

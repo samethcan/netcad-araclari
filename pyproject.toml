@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netcad-ncz"
+version = "1.0.0"
+description = "Netcad NCZ (8.x) dosya okuyucu: katmanlar, nokta, çizgi, poligon, yazı; GeoJSON çıktısı."
+readme = "ncz/README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Samet Hüseyin Can" }]
+requires-python = ">=3.8"
+keywords = ["netcad", "ncz", "cbs", "gis", "kadastro", "harita", "geojson"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Natural Language :: Turkish",
+  "Topic :: Scientific/Engineering :: GIS",
+]
+
+[project.urls]
+Homepage = "https://samethcan.github.io/netcad-araclari/"
+Source = "https://github.com/samethcan/netcad-araclari"
+Documentation = "https://samethcan.github.io/netcad-araclari/ncz-bicimi/"
+
+[project.scripts]
+ncz-oku = "netcad_ncz.ncz_reader:main"
+
+[tool.setuptools]
+packages = ["netcad_ncz"]
+package-dir = { netcad_ncz = "ncz" }

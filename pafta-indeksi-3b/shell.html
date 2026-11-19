@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Pafta İndeksi 3B</title>
+<style>/*__MLCSS__*/</style>
+<style>/*__APPCSS__*/</style>
+</head>
+<body>
+<div id="map"></div>
+<canvas id="ov" aria-hidden="true"></canvas>
+
+<header id="top">
+  <div class="bar">
+    <div class="logo" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="qwrap">
+      <input id="q" type="search" inputmode="text" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+             placeholder="Ada/parsel, pafta ya da koordinat" aria-label="Ada/parsel, pafta adı ya da koordinat">
+      <button id="qx" class="ib" aria-label="Temizle" hidden><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <button id="go" class="ib go" aria-label="Sorgula"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
+  </div>
+  <div id="sugg" role="listbox"></div>
+</header>
+
+<div id="fab">
+  <button id="bMode" class="fb wide" aria-label="Görünüm"><span id="bModeT">3B</span></button>
+  <button id="bLay" class="fb" aria-label="Katmanlar"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".55"/></svg></button>
+  <button id="bNorth" class="fb" aria-label="Kuzeye çevir"><svg viewBox="0 0 24 24" id="needle"><path d="M12 3l4 9h-8l4-9z" class="n"/><path d="M12 21l-4-9h8l-4 9z"/></svg></button>
+  <button id="bHome" class="fb" aria-label="Tüm alan"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</div>
+
+<div id="layers" class="pop" hidden>
+  <div class="ph">Katmanlar</div>
+  <label class="lt"><input type="checkbox" data-l="i" checked><i class="sw i"></i>ITRF pafta</label>
+  <label class="lt"><input type="checkbox" data-l="y" checked><i class="sw y"></i>Yersel pafta</label>
+  <label class="lt"><input type="checkbox" data-l="k" checked><i class="sw k"></i>Kadastro pafta</label>
+  <label class="lt"><input type="checkbox" data-l="p" checked><i class="sw p"></i>Parseller</label>
+  <label class="lt"><input type="checkbox" data-l="m" checked><i class="sw m"></i>Mahalleler</label>
+  <div class="ph sub">Katman aralığı <span id="gapv"></span></div>
+  <input type="range" id="gap" min="0.4" max="2.5" step="0.1" value="1" aria-label="Katman aralığı">
+  <div class="lnote">Katmanlı görünümde paftalar alttan üste: kadastro (zemin), Yersel, ITRF.</div>
+</div>
+
+<section id="sheet" class="peek" aria-label="Sonuçlar">
+  <div id="grab" aria-label="Paneli büyüt/küçült"><span></span></div>
+  <div id="sbody"></div>
+</section>
+
+<div id="modal" class="modal" hidden><div class="mbox" role="dialog" aria-modal="true"><div id="mbody"></div></div></div>
+<div id="toast" role="status"></div>
+<div id="loading"><div class="ld"><div class="logo big"><i></i><i></i><i></i></div><div id="ldt">Veri açılıyor…</div></div></div>
+
+<script id="pk" type="application/octet-stream">__DATA__</script>
+<script>/*__MLJS__*/</script>
+<script>/*__PROJ__*/</script>
+<script>/*__APPJS__*/</script>
+</body>
+</html>

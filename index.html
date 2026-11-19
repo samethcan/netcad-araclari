@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netcad Araçları — aplikasyon alan hesabı, NCZ okuyucu, 3B pafta indeksi</title>
+<meta name="description" content="Netcad kullanan harita büroları, kurumlar ve tüm haritacılar için ücretsiz, açık kaynak araçlar: aplikasyon belgesinden alan hesabı ve NCZ çıktısı, NCZ okuyucu, 3B pafta indeksi.">
+<meta name="author" content="Samet Hüseyin Can">
+<link rel="canonical" href="https://samethcan.github.io/netcad-araclari/">
+<meta property="og:title" content="Netcad Araçları">
+<meta property="og:description" content="Aplikasyon alan hesabı, NCZ okuyucu, 3B pafta indeksi — tarayıcıda çalışan açık kaynak araçlar.">
+<meta property="og:url" content="https://samethcan.github.io/netcad-araclari/">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"netcad-araclari","description":"Netcad kullanan harita büroları, kurumlar ve tüm haritacılar için açık kaynak araçlar.","codeRepository":"https://github.com/samethcan/netcad-araclari","license":"https://opensource.org/licenses/MIT","programmingLanguage":["Python","JavaScript"],"author":{"@type":"Person","name":"Samet Hüseyin Can","url":"https://samethcan.github.io/"}}
+</script>
+<style>
+:root{color-scheme:light dark;--fg:#1d1d1f;--mut:#5f6368;--bg:#fff;--card:#f5f5f7;--acc:#0a66c2;--bd:#e3e3e8}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--mut:#a0a0a5;--bg:#121214;--card:#1e1e22;--acc:#58a6ff;--bd:#2c2c31}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--fg);background:var(--bg)}
+main{max-width:820px;margin:0 auto;padding:56px 24px}
+h1{font-size:2rem;margin:0 0 8px;letter-spacing:-.02em}
+.lead{color:var(--mut);margin:0 0 40px}
+h2{font-size:.95rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:40px 0 14px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{display:block;background:var(--card);border-radius:12px;padding:20px 22px;color:inherit;text-decoration:none;border:1px solid transparent}
+a.card:hover{border-color:var(--acc)}
+.card b{color:var(--acc);font-size:1.08rem}.card p{margin:6px 0 0;color:var(--mut);font-size:.95rem}
+.tag{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:99px;border:1px solid var(--bd);color:var(--mut);margin-left:6px;vertical-align:2px}
+ul{padding-left:20px;color:var(--mut)}li{margin:4px 0}li a{color:var(--acc)}code{font-size:.9em}
+footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--bd);color:var(--mut);font-size:.9rem}
+footer a{color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<h1>Netcad Araçları</h1>
+<p class="lead">Netcad kullanan harita büroları, kurumlar ve tüm harita mühendisi ve teknikerleri için ücretsiz, açık kaynak araçlar. Kurulum gerekmez; tarayıcıda çalışır.</p>
+
+<h2>Hemen dene</h2>
+<div class="grid">
+<a class="card" href="aplikasyon/aplikasyon_alan_hesabi.html">
+<b>Aplikasyon Alan Hesabı</b>
+<p>Aplikasyon belgesindeki köşe koordinatlarından alan hesabı, belge ve tapu alanı karşılaştırması, yanılma sınırı kontrolü. Sonucu doğrudan Netcad <code>.ncz</code> (ayrıca DXF, NCN, rapor) olarak indirir.</p>
+</a>
+<a class="card" href="demo/pafta-indeksi-3b/">
+<b>3B Pafta İndeksi</b><span class="tag">uydurma veri</span>
+<p>Ada/parsel, pafta adı ya da koordinat yazınca parselin hangi kadastro, yersel ve ITRF paftalarına girdiğini 3B haritada gösterir. Telefonda da çalışır.</p>
+</a>
+</div>
+
+<h2>Kaynak kodda</h2>
+<ul>
+<li><b>NCZ okuyucu</b> (Python): Netcad 8.x NCZ dosyasından katman, nokta, poligon ve yazıları okur, GeoJSON'a çevirir. Kurulum: <code>pip install netcad-ncz</code>. Ayrıntılı anlatım: <a href="ncz-bicimi/">Netcad NCZ dosya biçimi</a>.</li>
+<li><b>Kadastro</b>: açık pafta çizgilerinden numaralı pafta alanları üretir.</li>
+<li><b>Geodezi</b>: ITRF 1/1000 pafta adı hesabı ve tapu alanı yanılma sınırı.</li>
+</ul>
+
+<h2>Notlar</h2>
+<ul>
+<li>Bu sayfalarda hiçbir kuruma ait veri yoktur. 3B indeksteki parseller tamamen uydurmadır.</li>
+<li>Aplikasyon aracında belgeyi yapay zekâyla otomatik okumak isteğe bağlıdır ve kendi Anthropic API anahtarınızla çalışır. Anahtar yalnızca sizin tarayıcınızda saklanır. Anahtar olmadan koordinatlar elle girilir.</li>
+<li>NCZ biçimi resmî olarak belgelenmemiştir; üretilen dosyaları Netcad'de kontrol edin.</li>
+</ul>
+
+<footer>
+<a href="https://github.com/samethcan/netcad-araclari">GitHub'da kaynak kod</a> ·
+<a href="https://samethcan.github.io/">Samet Hüseyin Can</a>
+</footer>
+</main>
+</body>
+</html>
