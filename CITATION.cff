@@ -5,6 +5,7 @@ type: software
 authors:
   - family-names: "Can"
     given-names: "Samet Hüseyin"
+    orcid: "https://orcid.org/0009-0007-5050-8346"
 version: "1.0.0"
 doi: "10.5281/zenodo.24363592"
 date-released: "2026-11-19"
