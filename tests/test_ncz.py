@@ -14,7 +14,7 @@ FIX = Path(__file__).parent / 'fixtures' / 'ornek_100.ncz'
 
 
 def shoelace(pts):
-    return abs(sum(x1 * y2 - x2 * y1 for (x1, y1), (x2, y2) in zip(pts, pts[1:]))) / 2
+    return abs(sum(x1 * y2 - x2 * y1 for (x1, y1), (x2, y2) in zip(pts, pts[1:], strict=False))) / 2
 
 
 @pytest.fixture(scope='module')

@@ -38,7 +38,7 @@ def frames(g):
 
 
 def sheets(geoms, names):
-    return [{'n': n, 'r': enc(g.exterior.coords), 'f': frames(g), 't': 0} for g, n in zip(geoms, names)]
+    return [{'n': n, 'r': enc(g.exterior.coords), 'f': frames(g), 't': 0} for g, n in zip(geoms, names, strict=True)]
 
 
 # Yersel benzeri 2x2, ITRF benzeri 3x2 paftalar (adlar uydurma)
@@ -73,7 +73,7 @@ def over(g, L):
 
 
 G = []
-for i, (g, k) in enumerate(zip(P, LAB)):
+for i, (g, k) in enumerate(zip(P, LAB, strict=True)):
     m = [MN[j] for j, mm in enumerate(M) if g.intersection(mm).area / g.area > 0.05]
     e = {'k': k, 'm': ' / '.join(m), 'a': round(g.area, 2), 'p': [i], 'y': over(g, Y), 'i': over(g, I), 'c': 1}
     e['kd'] = over(g, K); e['kc'] = 100.0
@@ -81,10 +81,10 @@ for i, (g, k) in enumerate(zip(P, LAB)):
 
 data = {
     'o': [OY, OX], 'sy': sheets(Y, YN), 'si': sheets(I, IN), 'fw': FR_W,
-    'kf': [{'n': n, 'r': enc(g.exterior.coords)} for g, n in zip(K, KN)],
+    'kf': [{'n': n, 'r': enc(g.exterior.coords)} for g, n in zip(K, KN, strict=True)],
     'kl': [enc(g.exterior.coords, closed=False) for g in K],
-    'kt': [[n[0], round((g.centroid.x - OY) * 100), round((g.centroid.y - OX) * 100)] for g, n in zip(K, KN)],
-    'mh': [{'n': n, 'r': [enc(g.exterior.coords)], 'c': [round((g.centroid.x - OY) * 100), round((g.centroid.y - OX) * 100)]} for g, n in zip(M, MN)],
+    'kt': [[n[0], round((g.centroid.x - OY) * 100), round((g.centroid.y - OX) * 100)] for g, n in zip(K, KN, strict=True)],
+    'mh': [{'n': n, 'r': [enc(g.exterior.coords)], 'c': [round((g.centroid.x - OY) * 100), round((g.centroid.y - OX) * 100)]} for g, n in zip(M, MN, strict=True)],
     'pg': [enc(g.exterior.coords) for g in P],
     'pl': [v for g in P for c in [g.representative_point()] for v in (round((c.x - OY) * 100), round((c.y - OX) * 100))],
     'g': G,

@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
-      - run: pip install -e . pytest ruff shapely
+      - run: pip install -e . pytest "ruff==0.17.5" shapely
       - run: ruff check ncz tests geodezi kadastro pafta-indeksi-3b/*.py
       - run: pytest -q
       - run: python geodezi/pafta_ve_tolerans.py
